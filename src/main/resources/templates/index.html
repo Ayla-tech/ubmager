@@ -3,24 +3,194 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UBMager</title>
-
-    <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <title>Tester API UBMager</title>
+    <!-- Manggil Tailwind v4 via CDN biar langsung jalan -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   </head>
+  <body class="bg-slate-100 p-8 font-sans">
+    <div class="max-w-2xl mx-auto space-y-6">
+      <h1 class="text-3xl font-extrabold text-center text-slate-800">
+        🚀 Tester API UBMager
+      </h1>
 
-  <body class="min-h-screen bg-gray-100 text-gray-900">
-    <main class="flex min-h-screen items-center justify-center">
-      <div class="rounded-2xl bg-white p-10 text-center shadow-lg">
-        <h1 class="text-4xl font-bold text-blue-600">UBMager</h1>
-
-        <p class="mt-4 text-gray-600">Welcome to UBMager!</p>
-
+      <!-- 1. Form Registrasi -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-700 mb-4">
+          1. Bikin Akun (Registrasi)
+        </h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <input
+            type="text"
+            id="regUser"
+            placeholder="Username"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <input
+            type="text"
+            id="regEmail"
+            placeholder="Email / HP"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <input
+            type="password"
+            id="regPass"
+            placeholder="Password"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <input
+            type="text"
+            id="regNama"
+            placeholder="Nama Lengkap"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
         <button
-          class="mt-6 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+          onclick="registrasi()"
+          class="w-full bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
-          Get Started
+          Daftar & Kirim OTP
         </button>
       </div>
-    </main>
+
+      <!-- 2. Form Verifikasi -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-700 mb-2">2. Verifikasi OTP</h2>
+        <p class="text-sm text-rose-500 font-medium mb-4">
+          Penting: Cek 6 digit angka OTP-nya di terminal Spring Boot kamu!
+        </p>
+        <div class="flex gap-4">
+          <input
+            type="text"
+            id="otpCode"
+            placeholder="Masukkan 6 Digit OTP"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-green-500 outline-none"
+          />
+          <button
+            onclick="verifikasi()"
+            class="bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition"
+          >
+            Verifikasi
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Form Cek Profil -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-700 mb-4">3. Cek Profil</h2>
+        <div class="flex gap-4">
+          <input
+            type="text"
+            id="cekIdUser"
+            placeholder="ID User (contoh: USR001)"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-purple-500 outline-none"
+          />
+          <button
+            onclick="cekProfil()"
+            class="bg-purple-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-700 transition"
+          >
+            Cari
+          </button>
+        </div>
+      </div>
+
+      <!-- Log Output -->
+      <div class="bg-slate-900 rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-slate-800 px-4 py-2 border-b border-slate-700">
+          <h3 class="text-slate-300 font-semibold text-sm">
+            Response Output JSON
+          </h3>
+        </div>
+        <pre
+          id="hasil"
+          class="p-4 text-emerald-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap"
+        >
+Silakan jalankan aksi di atas...</pre
+        >
+      </div>
+    </div>
+
+    <script>
+      // Simpan data registrasi sementara karena endpoint verifikasi butuh data ini lagi
+      let dataRegistrasi = {};
+
+      function tampilkanLog(data) {
+        document.getElementById("hasil").innerText = JSON.stringify(
+          data,
+          null,
+          4,
+        );
+      }
+
+      function registrasi() {
+        dataRegistrasi = {
+          username: document.getElementById("regUser").value,
+          email_atau_hp: document.getElementById("regEmail").value,
+          password: document.getElementById("regPass").value,
+          nama_lengkap: document.getElementById("regNama").value,
+        };
+
+        document.getElementById("hasil").innerText = "Loading registrasi...";
+
+        fetch("/api/profil/registrasi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataRegistrasi),
+        })
+          .then((res) => res.json())
+          .then((data) => tampilkanLog(data))
+          .catch(
+            (err) =>
+              (document.getElementById("hasil").innerText = "Error: " + err),
+          );
+      }
+
+      function verifikasi() {
+        const kodeInput = document.getElementById("otpCode").value;
+        if (!kodeInput) {
+          alert("Isi kode OTP dulu!");
+          return;
+        }
+
+        // Gabungkan data registrasi awal dengan kode OTP
+        const payload = { ...dataRegistrasi, kode_input: kodeInput };
+        document.getElementById("hasil").innerText = "Loading verifikasi...";
+
+        fetch("/api/profil/verifikasi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            tampilkanLog(data);
+            // Kalau berhasil, otomatis isi ID User ke kotak Cek Profil
+            if (data.berhasil && data.data && data.data.id_user) {
+              document.getElementById("cekIdUser").value = data.data.id_user;
+            }
+          })
+          .catch(
+            (err) =>
+              (document.getElementById("hasil").innerText = "Error: " + err),
+          );
+      }
+
+      function cekProfil() {
+        const id = document.getElementById("cekIdUser").value;
+        if (!id) {
+          alert("Isi ID User dulu!");
+          return;
+        }
+
+        document.getElementById("hasil").innerText = "Mencari data...";
+
+        fetch("/api/profil/" + id)
+          .then((res) => res.json())
+          .then((data) => tampilkanLog(data))
+          .catch(
+            (err) =>
+              (document.getElementById("hasil").innerText = "Error: " + err),
+          );
+      }
+    </script>
   </body>
 </html>
