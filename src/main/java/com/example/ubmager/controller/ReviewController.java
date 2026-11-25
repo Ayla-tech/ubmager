@@ -131,7 +131,7 @@ public class ReviewController {
         }
         User user = cari.get();
 
-        List<DataReview> review = dataReviewRepository.findByIdTargetOrderByTanggalReviewDesc(idTarget);
+        List<DataReview> review = dataReviewRepository.cariTampil(idTarget);
 
         Map<String, Object> profil = Map.of(
                 "username", user.getUsername(),
@@ -147,6 +147,10 @@ public class ReviewController {
 
         if (!dataReviewRepository.existsById(idReview) || !userRepository.existsById(idPelapor)) {
             return new Hasil(false, "Data tidak ditemukan", null);
+        }
+
+        if (dataLaporanRepository.existsByIdReviewAndIdPelapor(idReview, idPelapor)) {
+            return new Hasil(false, "Review ini sudah kamu laporkan", null);
         }
 
         String alasan = teks(data, "alasan_laporan");

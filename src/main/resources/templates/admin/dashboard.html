@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Admin')}"></head>
+<body class="min-h-screen bg-slate-950 font-mono text-slate-200">
+
+<header class="border-b border-slate-800 bg-slate-900">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+    <p class="text-sm font-semibold text-white"><span class="text-emerald-400">OFFER</span> // ADMIN</p>
+    <div class="flex items-center gap-4 text-xs">
+      <span class="text-slate-400" th:text="${sesi.namaAdmin()}">Admin</span>
+      <form th:action="@{/admin/logout}" method="post">
+        <button type="submit" class="adm-btn-abu">Keluar</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-6xl px-4 py-8">
+  <h1 class="text-xl font-semibold text-white">Laporan review</h1>
+  <p class="mb-6 mt-1 text-xs text-slate-500">Setujui laporan untuk menyembunyikan review dan menghitung ulang rating penjual.</p>
+
+  <div th:if="${pesanSukses}" class="mb-4 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300" th:text="${pesanSukses}">Berhasil</div>
+  <div th:if="${pesanError}" class="mb-4 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300" th:text="${pesanError}">Gagal</div>
+
+  <!-- Ringkasan sekaligus filter -->
+  <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+    <a th:each="st : ${ {'semua','menunggu','diproses','disetujui','ditolak'} }"
+       th:href="@{/admin(status=${st})}"
+       class="adm-card block transition hover:border-emerald-500/50"
+       th:classappend="${filter == st} ? 'border-emerald-500' : ''">
+      <p class="text-[11px] uppercase tracking-wider text-slate-500" th:text="${st}">status</p>
+      <p class="mt-1 text-2xl font-semibold text-white" th:text="${hitung[st]}">0</p>
+    </a>
+  </div>
+
+  <div th:if="${#lists.isEmpty(daftarLaporan)}" class="adm-card text-center text-sm text-slate-500">Tidak ada laporan.</div>
+
+  <div class="space-y-4">
+    <article th:each="l : ${daftarLaporan}" class="adm-card">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-semibold text-white" th:text="${l.idLaporan()}">LPR001</span>
+          <span th:class="'adm-badge-' + ${l.status()}" th:text="${l.status()}">menunggu</span>
+        </div>
+        <span class="text-xs text-slate-500">dilaporkan <span th:text="${l.tanggal()}">1 Jan 2026</span> oleh <span class="text-slate-300" th:text="'@' + ${l.pelapor()}">@user</span></span>
+      </div>
+
+      <div class="mt-4 grid gap-4 md:grid-cols-2">
+        <div class="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <p class="text-[11px] uppercase tracking-wider text-slate-500">Review <span th:text="${l.idReview()}">REV001</span></p>
+          <p class="mt-1 text-xs text-slate-400">
+            <span th:text="'@' + ${l.reviewer()}">@a</span> &rarr; <span th:text="'@' + ${l.target()}">@b</span>
+            &middot; <span th:text="${l.tanggalReview()}">1 Jan 2026</span>
+          </p>
+          <div class="mt-2 text-sm">
+            <span th:replace="~{fragments/base :: bintang(${l.rating()})}"></span>
+          </div>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-200" th:text="${l.komentar() == null or l.komentar().isBlank()} ? '(tanpa komentar)' : ${l.komentar()}">Komentar</p>
+        </div>
+        <div class="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <p class="text-[11px] uppercase tracking-wider text-slate-500">Alasan laporan</p>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-200" th:text="${l.alasan()}">Alasan</p>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <form th:action="@{/admin/laporan/{id}/status(id=${l.idLaporan()})}" method="post">
+          <input type="hidden" name="status" value="diproses" /><input type="hidden" name="filter" th:value="${filter}" />
+          <button type="submit" class="adm-btn-abu" th:disabled="${l.selesai() or l.status() == 'diproses'}">Proses</button>
+        </form>
+        <form th:action="@{/admin/laporan/{id}/status(id=${l.idLaporan()})}" method="post">
+          <input type="hidden" name="status" value="disetujui" /><input type="hidden" name="filter" th:value="${filter}" />
+          <button type="submit" class="adm-btn-hijau" th:disabled="${l.selesai()}">Setujui dan sembunyikan</button>
+        </form>
+        <form th:action="@{/admin/laporan/{id}/status(id=${l.idLaporan()})}" method="post">
+          <input type="hidden" name="status" value="ditolak" /><input type="hidden" name="filter" th:value="${filter}" />
+          <button type="submit" class="adm-btn-merah" th:disabled="${l.selesai()}">Tolak</button>
+        </form>
+      </div>
+    </article>
+  </div>
+</main>
+</body>
+</html>

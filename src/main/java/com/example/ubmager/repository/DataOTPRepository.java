@@ -3,12 +3,15 @@ package com.example.ubmager.repository;
 import com.example.ubmager.entity.DataOTP;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface DataOTPRepository extends JpaRepository<DataOTP, String> {
+    Optional<DataOTP> findFirstByEmailAtauHpOrderByWaktuDibuatDesc(String emailAtauHp);
+
     @Query("SELECT o FROM DataOTP o WHERE o.emailAtauHp = :email AND o.kodeOtp = :kode "
     + "AND o.statusOtp = 'menunggu' AND o.waktuKadaluarsa > :sekarang ORDER BY o.waktuDibuat DESC")
     List<DataOTP> cariOtpValid(@Param("email") String email, @Param("kode") String kode, @Param("sekarang") LocalDateTime sekarang);

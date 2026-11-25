@@ -10,8 +10,16 @@ import org.springframework.data.repository.query.Param;
 public interface DataReviewRepository extends JpaRepository<DataReview, String> {
     boolean existsByIdPesananAndIdReviewer(String idPesanan, String idReviewer);
     List<DataReview> findByIdTargetOrderByTanggalReviewDesc(String idTarget);
+    List<DataReview> findByIdReviewer(String idReviewer);
 
-    @Query("SELECT AVG(r.rating) FROM DataReview r WHERE r.idTarget = :idTarget")
+    // Review yang laporannya sudah disetujui admin dianggap tersembunyi
+    @Query("SELECT r FROM DataReview r WHERE r.idTarget = :idTarget AND NOT EXISTS "
+    + "(SELECT l.idLaporan FROM DataLaporan l WHERE l.idReview = r.idReview AND l.statusLaporan = 'disetujui') "
+    + "ORDER BY r.tanggalReview DESC")
+    List<DataReview> cariTampil(@Param("idTarget") String idTarget);
+
+    @Query("SELECT AVG(r.rating) FROM DataReview r WHERE r.idTarget = :idTarget AND NOT EXISTS "
+    + "(SELECT l.idLaporan FROM DataLaporan l WHERE l.idReview = r.idReview AND l.statusLaporan = 'disetujui')")
     Double hitungRataRata(@Param("idTarget") String idTarget);
 
     @Modifying

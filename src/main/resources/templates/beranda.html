@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Beranda')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('beranda')}"></header>
+
+<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 px-8 py-12 text-white shadow-sm">
+    <h1 class="max-w-xl text-3xl font-extrabold leading-tight sm:text-4xl">Tawarkan yang kamu bisa. Temukan yang kamu butuh.</h1>
+    <p class="mt-3 max-w-lg text-brand-50">Jelajahi penawaran jasa dan barang, lihat reputasi penjualnya, lalu pilih yang paling kamu percaya.</p>
+    <div th:if="${!sesi.login()}" class="mt-6 flex gap-3">
+      <a th:href="@{/daftar}" class="btn bg-white text-brand-700 hover:bg-brand-50">Daftar gratis</a>
+      <a th:href="@{/login}" class="btn border border-white/40 text-white hover:bg-white/10">Masuk</a>
+    </div>
+    <div th:if="${sesi.login()}" class="mt-6">
+      <a th:href="@{/pesanan}" class="btn bg-white text-brand-700 hover:bg-brand-50">Lihat pesanan saya</a>
+    </div>
+    <div class="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-white/10"></div>
+  </section>
+
+  <h2 class="mb-4 mt-10 text-xl font-extrabold">Penawaran terbaru</h2>
+
+  <div th:if="${#lists.isEmpty(daftarPostingan)}" class="card text-center text-sm text-stone-500">Belum ada penawaran.</div>
+
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <article th:each="p : ${daftarPostingan}" class="card flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+      <span class="badge w-fit bg-brand-100 text-brand-700" th:text="${p.kategori()}">Kategori</span>
+      <h3 class="mt-3 text-base font-bold leading-snug" th:text="${p.judul()}">Judul</h3>
+      <p class="mt-1.5 line-clamp-2 text-sm text-stone-600" th:text="${p.deskripsi()}">Deskripsi</p>
+      <p class="mt-3 text-lg font-extrabold text-brand-600" th:text="${p.harga()}">Rp 0</p>
+
+      <a th:href="@{/pengguna/{id}(id=${p.idPenjual()})}" class="mt-4 flex items-center gap-3 border-t border-stone-100 pt-4">
+        <span class="avatar h-10 w-10 text-sm" th:text="${p.inisial()}">AB</span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-sm font-bold text-ink" th:text="${p.namaPenjual()}">Penjual</span>
+          <span class="flex items-center gap-1.5 text-xs text-stone-500">
+            <span th:if="${p.adaReview()}" class="flex items-center gap-1.5">
+              <span th:replace="~{fragments/base :: bintang(${p.bintang()})}"></span>
+              <span th:text="${p.ratingTampil()}">4.5</span>
+            </span>
+            <span th:unless="${p.adaReview()}">Belum ada review</span>
+          </span>
+        </span>
+        <span th:if="${p.terpercaya()}" class="badge-terpercaya">Terpercaya</span>
+      </a>
+    </article>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>
