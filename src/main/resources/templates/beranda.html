@@ -14,8 +14,10 @@
       <a th:href="@{/daftar}" class="btn bg-white text-brand-700 hover:bg-brand-50">Daftar gratis</a>
       <a th:href="@{/login}" class="btn border border-white/40 text-white hover:bg-white/10">Masuk</a>
     </div>
-    <div th:if="${sesi.login()}" class="mt-6">
+    <div th:if="${sesi.login()}" class="mt-6 flex flex-wrap gap-3">
       <a th:href="@{/pesanan}" class="btn bg-white text-brand-700 hover:bg-brand-50">Lihat pesanan saya</a>
+      <a th:href="@{/chat}" class="btn border border-white/40 text-white hover:bg-white/10">Buka Chat</a>
+      <a th:href="@{/notifikasi}" class="btn border border-white/40 text-white hover:bg-white/10">Notifikasi</a>
     </div>
     <div class="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-white/10"></div>
   </section>
@@ -36,19 +38,4 @@
         <span class="min-w-0 flex-1">
           <span class="block truncate text-sm font-bold text-ink" th:text="${p.namaPenjual()}">Penjual</span>
           <span class="flex items-center gap-1.5 text-xs text-stone-500">
-            <span th:if="${p.adaReview()}" class="flex items-center gap-1.5">
-              <span th:replace="~{fragments/base :: bintang(${p.bintang()})}"></span>
-              <span th:text="${p.ratingTampil()}">4.5</span>
-            </span>
-            <span th:unless="${p.adaReview()}">Belum ada review</span>
-          </span>
-        </span>
-        <span th:if="${p.terpercaya()}" class="badge-terpercaya">Terpercaya</span>
-      </a>
-    </article>
-  </div>
-</main>
-
-<footer th:replace="~{fragments/base :: footer}"></footer>
-</body>
-</html>
+            <span th:if="${p.adaReview()}" class="flex items-center gap-
