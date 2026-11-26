@@ -38,4 +38,25 @@
         <span class="min-w-0 flex-1">
           <span class="block truncate text-sm font-bold text-ink" th:text="${p.namaPenjual()}">Penjual</span>
           <span class="flex items-center gap-1.5 text-xs text-stone-500">
-            <span th:if="${p.adaReview()}" class="flex items-center gap-
+            <span th:if="${p.adaReview()}" class="flex items-center gap-1.5">
+              <span th:replace="~{fragments/base :: bintang(${p.bintang()})}"></span>
+              <span th:text="${p.ratingTampil()}">4.5</span>
+            </span>
+            <span th:unless="${p.adaReview()}">Belum ada review</span>
+          </span>
+        </span>
+        <span th:if="${p.terpercaya()}" class="badge-terpercaya">Terpercaya</span>
+      </a>
+
+      <div th:if="${sesi.login() and sesi.idUser() != p.idPenjual()}" class="mt-4 border-t border-stone-100 pt-3">
+        <a th:href="@{/chat/mulai(idPostingan=${p.idPostingan()})}" class="btn-primary btn-sm w-full justify-center">
+          Chat penjual
+        </a>
+      </div>
+    </article>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>
