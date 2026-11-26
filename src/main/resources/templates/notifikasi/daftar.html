@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Notifikasi')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('notifikasi')}"></header>
+
+<main class="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-extrabold">Notifikasi</h1>
+      <p class="mt-1 text-sm text-stone-500">
+        <span th:if="${belumDibaca > 0}"><span th:text="${belumDibaca}">3</span> belum dibaca</span>
+        <span th:if="${belumDibaca == 0}">Semua sudah dibaca</span>
+      </p>
+    </div>
+    <form th:if="${belumDibaca > 0}" th:action="@{/notifikasi/baca-semua}" method="post" style="margin:0;">
+      <button type="submit" class="btn-outline btn-sm">Tandai semua sudah dibaca</button>
+    </form>
+  </div>
+
+  <div th:if="${#lists.isEmpty(daftarNotifikasi)}" class="card mt-6 text-center text-sm text-stone-500">
+    Belum ada notifikasi.
+  </div>
+
+  <div class="mt-6 space-y-3">
+    <form th:each="n : ${daftarNotifikasi}" th:action="@{/notifikasi/{id}/buka(id=${n.idNotifikasi()})}"
+          method="post" style="margin:0;">
+      <button type="submit" class="card"
+              th:style="'width:100%;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:flex-start;padding:16px;'
+                        + (${!n.dibaca()} ? 'border-left:4px solid #f2631a;background:#fff6ef;' : '')">
+        <span style="flex:1;min-width:0;">
+          <span class="badge-baru"
+                th:text="${n.tipe() == 'pesan' ? 'Chat' : (n.tipe() == 'review' ? 'Review' : 'Info')}">Chat</span>
+          <span class="block text-sm text-ink" style="margin-top:6px;"
+                th:classappend="${!n.dibaca()} ? 'font-bold' : ''" th:text="${n.pesan()}">Pesan baru dari ...</span>
+          <span class="block text-xs text-stone-400" style="margin-top:2px;" th:text="${n.waktu()}">1 Jan 2026, 10.15</span>
+        </span>
+        <span th:if="${!n.dibaca()}" aria-label="Belum dibaca"
+              style="width:10px;height:10px;border-radius:9999px;background:#f2631a;margin-top:6px;flex-shrink:0;"></span>
+      </button>
+    </form>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>
