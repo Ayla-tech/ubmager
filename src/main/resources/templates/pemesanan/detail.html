@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Detail Pemesanan')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('pemesanan')}"></header>
+
+<main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <a th:if="${peranPenyedia}" th:href="@{/pemesanan(peran='penyedia')}" class="text-sm font-semibold text-stone-500 hover:text-brand-600">&larr; Kembali ke pesanan masuk</a>
+      <a th:unless="${peranPenyedia}" th:href="@{/pemesanan}" class="text-sm font-semibold text-stone-500 hover:text-brand-600">&larr; Kembali ke daftar pemesanan</a>
+      <h1 class="mt-2 text-2xl font-extrabold sm:text-3xl">Detail pemesanan</h1>
+      <p class="mt-1 font-mono text-xs text-stone-500" th:text="${pemesanan.idPemesanan()}">PMS000</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span th:class="${pemesanan.statusKelas()}" th:text="${pemesanan.statusLabel()}">Menunggu</span>
+      <span th:if="${pemesanan.sudahBayar()}" th:class="${pemesanan.statusPembayaranKelas()}" th:text="${pemesanan.statusPembayaranLabel()}">Pembayaran</span>
+    </div>
+  </div>
+
+  <div id="pesanAksi" class="alert-error mt-5" hidden role="alert"></div>
+
+  <div class="mt-6 grid items-start gap-6 lg:grid-cols-3">
+    <section class="space-y-6 lg:col-span-2">
+      <article class="card">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="badge bg-brand-100 text-brand-700" th:text="${pemesanan.kategori()}">Kategori</span>
+          <span class="font-mono text-xs text-stone-400" th:text="${pemesanan.idPostingan()}">PST000</span>
+        </div>
+        <h2 class="mt-3 text-2xl font-extrabold leading-tight" th:text="${pemesanan.judul()}">Judul jasa</h2>
+        <p class="mt-4 text-xl font-extrabold text-brand-600" th:text="${pemesanan.total()}">Rp 0</p>
+
+        <dl class="mt-5 grid gap-x-8 gap-y-3 border-t border-stone-100 pt-5 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-stone-500">Jumlah</dt>
+            <dd class="mt-0.5 font-bold" th:text="${pemesanan.jumlah()}">1</dd>
+          </div>
+          <div>
+            <dt class="text-stone-500">Harga satuan</dt>
+            <dd class="mt-0.5 font-bold" th:text="${pemesanan.hargaSatuan()}">Rp 0</dd>
+          </div>
+          <div>
+            <dt class="text-stone-500">Waktu pelaksanaan</dt>
+            <dd class="mt-0.5 font-bold" th:text="${pemesanan.waktu()}">-</dd>
+          </div>
+          <div>
+            <dt class="text-stone-500">Lokasi</dt>
+            <dd class="mt-0.5 font-bold" th:text="${pemesanan.lokasi()}">-</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-stone-500">Catatan</dt>
+            <dd class="mt-0.5 whitespace-pre-line font-medium" th:text="${pemesanan.catatan()}">-</dd>
+          </div>
+          <div>
+            <dt class="text-stone-500">Nomor pesanan</dt>
+            <dd class="mt-0.5 font-mono text-xs font-semibold" th:text="${pemesanan.idPesanan()}">PSN000</dd>
+          </div>
+          <div>
+            <dt class="text-stone-500">Dibuat</dt>
+            <dd class="mt-0.5 font-bold" th:text="${pemesanan.dibuat()}">-</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="card">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-stone-500">Pihak terkait</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="flex items-center gap-3 rounded-xl border border-stone-200 p-4">
+            <span class="avatar h-10 w-10 text-sm" th:text="${pemesanan.inisialPembeli()}">AB</span>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wider text-stone-400">Pembeli</p>
+              <p class="truncate text-sm font-bold" th:text="${pemesanan.namaPembeli()}">Nama</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 rounded-xl border border-stone-200 p-4">
+            <span class="avatar h-10 w-10 text-sm" th:text="${pemesanan.inisialPenyedia()}">AB</span>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wider text-stone-400">Penyedia</p>
+              <a th:if="${pemesanan.idPenyedia() != null}" th:href="@{/pengguna/{id}(id=${pemesanan.idPenyedia()})}" class="block truncate text-sm font-bold hover:text-brand-600" th:text="${pemesanan.namaPenyedia()}">Nama</a>
+              <p th:unless="${pemesanan.idPenyedia() != null}" class="truncate text-sm font-bold" th:text="${pemesanan.namaPenyedia()}">-</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-stone-500">Perjalanan pesanan</h2>
+        <ol class="mt-5 space-y-5">
+          <li class="flex gap-3">
+            <span class="tl-dot tl-done">1</span>
+            <div>
+              <p class="text-sm font-bold">Pesanan dibuat</p>
+              <p class="text-xs text-stone-500" th:text="${pemesanan.dibuat()}">-</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <span class="tl-dot"
+                  th:classappend="${pemesanan.status() == 'ditolak' ? 'tl-fail' : (pemesanan.status() == 'menunggu' ? 'tl-wait' : 'tl-done')}">2</span>
+            <div>
+              <p class="text-sm font-bold" th:text="${pemesanan.status() == 'ditolak' ? 'Ditolak penyedia' : (pemesanan.status() == 'menunggu' ? 'Menunggu tanggapan penyedia' : 'Diterima penyedia')}">Tanggapan penyedia</p>
+              <p class="text-xs text-stone-500"
+                 th:text="${pemesanan.status() == 'ditolak' ? 'Pesanan tidak dapat dilanjutkan.' : (pemesanan.status() == 'menunggu' ? 'Penyedia akan meninjau permintaanmu.' : 'Kamu bisa melanjutkan ke pembayaran.')}">Keterangan</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <span class="tl-dot"
+                  th:classappend="${pemesanan.status() == 'ditolak' ? 'tl-idle' : (pemesanan.statusPesanan() == 'dibayar' or pemesanan.statusPesanan() == 'selesai' ? 'tl-done' : (pemesanan.sudahBayar() ? 'tl-wait' : 'tl-idle'))}">3</span>
+            <div>
+              <p class="text-sm font-bold"
+                 th:text="${pemesanan.status() == 'ditolak' ? 'Pembayaran tidak diperlukan' : (pemesanan.statusPesanan() == 'dibayar' or pemesanan.statusPesanan() == 'selesai' ? 'Pembayaran terkonfirmasi' : (pemesanan.sudahBayar() ? 'Pembayaran menunggu konfirmasi' : 'Belum dibayar'))}">Pembayaran</p>
+              <p class="text-xs text-stone-500"
+                 th:text="${pemesanan.status() == 'ditolak' ? 'Pesanan sudah dibatalkan.' : (pemesanan.sudahBayar() ? pemesanan.statusPembayaranLabel() : 'Lanjutkan pembayaran setelah pesanan diterima.')}">Keterangan</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <span class="tl-dot" th:classappend="${pemesanan.statusPesanan() == 'selesai' ? 'tl-done' : 'tl-idle'}">4</span>
+            <div>
+              <p class="text-sm font-bold" th:text="${pemesanan.statusPesanan() == 'selesai' ? 'Layanan selesai' : 'Belum selesai'}">Selesai</p>
+              <p class="text-xs text-stone-500"
+                 th:text="${pemesanan.statusPesanan() == 'selesai' ? 'Pesanan sudah ditandai selesai oleh penyedia.' : 'Penyedia menandai selesai setelah pembayaran terkonfirmasi.'}">Keterangan</p>
+            </div>
+          </li>
+        </ol>
+      </article>
+    </section>
+
+    <aside class="lg:sticky lg:top-24">
+      <section class="card">
+        <h2 class="text-lg font-extrabold">Langkah berikutnya</h2>
+
+        <!-- Pembeli -->
+        <div th:if="${!peranPenyedia}" class="mt-4 space-y-3">
+          <div th:if="${pemesanan.bisaBayar()}">
+            <p class="text-sm text-stone-600">Pesanan sudah diterima. Lanjutkan ke pembayaran untuk mengirim metode dan bukti.</p>
+            <a th:href="@{/pembayaran/pesanan/{id}(id=${pemesanan.idPesanan()})}" class="btn-primary mt-3 w-full">Lanjut ke pembayaran</a>
+          </div>
+
+          <div th:if="${pemesanan.sudahBayar() and pemesanan.idPembayaran() != null}">
+            <p class="text-sm text-stone-600">Pembayaran sudah tercatat dengan status <span class="font-semibold" th:text="${pemesanan.statusPembayaranLabel()}">status</span>.</p>
+            <a th:href="@{/pembayaran/{id}(id=${pemesanan.idPembayaran()})}" class="btn-outline mt-3 w-full">Lihat pembayaran</a>
+          </div>
+
+          <div th:if="${pemesanan.status() == 'menunggu'}">
+            <p class="text-sm text-stone-600">Pesanan sedang ditinjau penyedia. Kamu akan melihat perubahan status di halaman ini.</p>
+          </div>
+
+          <div th:if="${pemesanan.status() == 'ditolak'}">
+            <p class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">Pesanan ditolak penyedia. Kamu bisa memesan jasa lain atau menghubungi penyedia di luar sistem.</p>
+          </div>
+
+          <a th:href="@{/jasa}" class="btn-ghost w-full">Cari jasa lain</a>
+        </div>
+
+        <!-- Penyedia -->
+        <div th:if="${peranPenyedia}" class="mt-4 space-y-3">
+          <div th:if="${pemesanan.status() == 'menunggu'}">
+            <p class="text-sm text-stone-600">Tanggapi permintaan ini dari halaman pesanan masuk.</p>
+            <a th:href="@{/pemesanan(peran='penyedia')}" class="btn-primary mt-3 w-full">Buka pesanan masuk</a>
+          </div>
+
+          <div th:if="${pemesanan.status() == 'diterima' and !pemesanan.sudahBayar()}">
+            <p class="text-sm text-stone-600">Pesanan sudah diterima. Menunggu pembeli mengirim pembayaran.</p>
+          </div>
+
+          <div th:if="${pemesanan.sudahBayar() and pemesanan.idPembayaran() != null}">
+            <p class="text-sm text-stone-600">Pembayaran berstatus <span class="font-semibold" th:text="${pemesanan.statusPembayaranLabel()}">status</span>.</p>
+            <a th:href="@{/pembayaran/{id}(id=${pemesanan.idPembayaran()})}" class="btn-outline mt-3 w-full">Tinjau pembayaran</a>
+          </div>
+
+          <div th:if="${pemesanan.bisaSelesai()}">
+            <p class="text-sm text-stone-600">Pembayaran sudah dikonfirmasi. Setelah layanan benar-benar selesai, tandai pesanan.</p>
+            <button type="button" id="tombolSelesai" class="btn-primary mt-3 w-full"
+                    th:attr="data-id=${pemesanan.idPemesanan()},data-id-penyedia=${pemesanan.idPenyedia()}">Tandai layanan selesai</button>
+          </div>
+
+          <div th:if="${pemesanan.status() == 'ditolak'}">
+            <p class="text-sm text-stone-600">Pesanan ini sudah kamu tolak.</p>
+          </div>
+        </div>
+      </section>
+
+      <p class="mt-4 px-2 text-xs leading-relaxed text-stone-500">
+        Identitas penyedia pada aksi ini masih dikirim dari sesi pengguna. Backend mencocokkannya dengan pemilik postingan, tetapi belum memakai autentikasi peran penuh.
+      </p>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+<div th:replace="~{fragments/transaksi :: dialog}"></div>
+<script th:src="@{/js/transaksi.js}" defer></script>
+</body>
+</html>

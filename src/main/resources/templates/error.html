@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Halaman tidak ditemukan')}"></head>
+<body class="flex min-h-screen items-center justify-center px-6">
+  <div class="text-center">
+    <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-2xl font-extrabold text-white">O</span>
+    <h1 class="mt-5 text-4xl font-extrabold">Ups</h1>
+    <p class="mt-2 text-stone-500">Halaman yang kamu cari tidak ada atau sedang bermasalah.</p>
+    <a th:href="@{/}" class="btn-primary mt-6">Kembali ke beranda</a>
+  </div>
+</body>
+</html>

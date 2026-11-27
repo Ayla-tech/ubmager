@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Masuk')}"></head>
+<body class="min-h-screen">
+<div class="grid min-h-screen md:grid-cols-2">
+  <aside th:replace="~{fragments/base :: authPanel}"></aside>
+
+  <main class="flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm">
+      <a th:href="@{/}" class="mb-8 flex items-center gap-2 md:hidden">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-lg font-extrabold text-white">O</span>
+        <span class="text-lg font-extrabold">OFFER</span>
+      </a>
+      <h1 class="text-2xl font-extrabold">Masuk ke OFFER</h1>
+      <p class="mb-6 mt-1 text-sm text-stone-500">Senang melihatmu lagi.</p>
+
+      <div th:replace="~{fragments/base :: alert}"></div>
+
+      <form th:action="@{/login}" method="post" class="space-y-4">
+        <div>
+          <label for="identitas" class="label">Username atau email/HP</label>
+          <input id="identitas" name="identitas" type="text" required autofocus class="input" th:value="${identitas}" />
+        </div>
+        <div>
+          <label for="password" class="label">Password</label>
+          <input id="password" name="password" type="password" required class="input" />
+        </div>
+        <button type="submit" class="btn-primary w-full">Masuk</button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-stone-500">Belum punya akun? <a th:href="@{/daftar}" class="font-semibold text-brand-600 hover:underline">Daftar</a></p>
+    </div>
+  </main>
+</div>
+</body>
+</html>

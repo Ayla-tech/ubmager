@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Daftar')}"></head>
+<body class="min-h-screen">
+<div class="grid min-h-screen md:grid-cols-2">
+  <aside th:replace="~{fragments/base :: authPanel}"></aside>
+
+  <main class="flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm">
+      <a th:href="@{/}" class="mb-8 flex items-center gap-2 md:hidden">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-lg font-extrabold text-white">O</span>
+        <span class="text-lg font-extrabold">OFFER</span>
+      </a>
+      <h1 class="text-2xl font-extrabold">Buat akun baru</h1>
+      <p class="mb-6 mt-1 text-sm text-stone-500">Kami kirim kode OTP untuk memverifikasi kontakmu.</p>
+
+      <div th:replace="~{fragments/base :: alert}"></div>
+
+      <form th:action="@{/daftar}" method="post" class="space-y-4">
+        <div>
+          <label for="namaLengkap" class="label">Nama lengkap</label>
+          <input id="namaLengkap" name="namaLengkap" type="text" required maxlength="100" class="input" th:value="${namaLengkap}" />
+        </div>
+        <div>
+          <label for="username" class="label">Username</label>
+          <input id="username" name="username" type="text" required minlength="3" maxlength="50" class="input" th:value="${username}" />
+          <p class="hint">Huruf, angka, titik, dan garis bawah.</p>
+        </div>
+        <div>
+          <label for="emailAtauHp" class="label">Email atau nomor HP</label>
+          <input id="emailAtauHp" name="emailAtauHp" type="text" required maxlength="100" class="input" th:value="${emailAtauHp}" />
+        </div>
+        <div>
+          <label for="password" class="label">Password</label>
+          <input id="password" name="password" type="password" required minlength="8" class="input" />
+          <p class="hint">Minimal 8 karakter.</p>
+        </div>
+        <button type="submit" class="btn-primary w-full">Kirim kode OTP</button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-stone-500">Sudah punya akun? <a th:href="@{/login}" class="font-semibold text-brand-600 hover:underline">Masuk</a></p>
+    </div>
+  </main>
+</div>
+</body>
+</html>

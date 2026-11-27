@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+@source "../resources/templates";
+@source "../resources/static";
+
+/* =========================================================
+   OFFER design system
+   User: hangat (oranye + krem). Admin: gelap (slate + emerald).
+   ========================================================= */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-brand-50: #fff6ef;
+  --color-brand-100: #ffe8d6;
+  --color-brand-200: #ffcfab;
+  --color-brand-300: #ffae77;
+  --color-brand-400: #fb8340;
+  --color-brand-500: #f2631a;
+  --color-brand-600: #d94d0f;
+  --color-brand-700: #b43a0f;
+  --color-brand-800: #8f2f13;
+  --color-cream: #fffaf5;
+  --color-ink: #1f1a17;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility alert {
+  @apply mb-5 rounded-xl border px-4 py-3 text-sm font-medium;
+}
+
+@utility badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+
+@utility adm-btn {
+  @apply inline-flex cursor-pointer items-center justify-center rounded-md border px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wide transition disabled:cursor-not-allowed disabled:opacity-30;
+}
+
+@utility adm-badge {
+  @apply inline-flex rounded border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+  }
+  ::selection {
+    @apply bg-brand-200;
+  }
+}
+
+@layer components {
+  /* ---------- Tombol ---------- */
+  .btn-primary {
+    @apply btn bg-brand-500 text-white shadow-sm hover:bg-brand-600;
+  }
+  .btn-outline {
+    @apply btn border border-stone-300 bg-white text-stone-700 hover:border-brand-300 hover:bg-brand-50;
+  }
+  .btn-ghost {
+    @apply btn text-stone-600 hover:bg-brand-100/60;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  /* ---------- Kartu & form ---------- */
+  .card {
+    @apply rounded-2xl border border-stone-200 bg-white p-6 shadow-sm;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-stone-700;
+  }
+  .input {
+    @apply w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-stone-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200;
+  }
+  .hint {
+    @apply mt-1 text-xs text-stone-500;
+  }
+
+  /* ---------- Alert ---------- */
+  .alert-sukses {
+    @apply alert border-emerald-200 bg-emerald-50 text-emerald-800;
+  }
+  .alert-error {
+    @apply alert border-red-200 bg-red-50 text-red-700;
+  }
+
+  /* ---------- Avatar ---------- */
+  .avatar {
+    @apply inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-100 font-bold text-brand-700;
+  }
+
+  /* ---------- Badge ---------- */
+  .badge-terpercaya {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+  .badge-baru {
+    @apply badge bg-stone-100 text-stone-600;
+  }
+  .badge-menunggu {
+    @apply badge bg-amber-100 text-amber-800;
+  }
+  .badge-dibayar {
+    @apply badge bg-sky-100 text-sky-800;
+  }
+  .badge-selesai {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+  .badge-dibatalkan {
+    @apply badge bg-stone-200 text-stone-600;
+  }
+  .badge-diterima {
+    @apply badge bg-sky-100 text-sky-800;
+  }
+  .badge-ditolak {
+    @apply badge bg-red-100 text-red-700;
+  }
+  .badge-dikonfirmasi {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+  .badge-perbaikan {
+    @apply badge bg-orange-100 text-orange-800;
+  }
+
+  /* ---------- Bintang ---------- */
+  .stars {
+    @apply inline-flex tracking-tight;
+  }
+  .stars .on {
+    @apply text-amber-400;
+  }
+  .stars .off {
+    @apply text-stone-300;
+  }
+
+  /* ---------- Langkah status ---------- */
+  .tl-dot {
+    @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold;
+  }
+  .tl-done {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+  .tl-wait {
+    @apply bg-amber-100 text-amber-700;
+  }
+  .tl-fail {
+    @apply bg-red-100 text-red-700;
+  }
+  .tl-idle {
+    @apply bg-stone-100 text-stone-400;
+  }
+
+  .star-input {
+    @apply inline-flex flex-row-reverse gap-1;
+  }
+  .star-input input {
+    @apply sr-only;
+  }
+  .star-input label {
+    @apply cursor-pointer text-4xl leading-none text-stone-300 transition;
+  }
+  .star-input input:checked ~ label,
+  .star-input label:hover,
+  .star-input label:hover ~ label {
+    @apply text-amber-400;
+  }
+  .star-input input:focus-visible + label {
+    @apply rounded outline-2 outline-brand-400;
+  }
+
+  /* ---------- Admin (gelap, beda dari user) ---------- */
+  .adm-card {
+    @apply rounded-lg border border-slate-800 bg-slate-900 p-5;
+  }
+  .adm-input {
+    @apply w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2.5 font-mono text-sm text-slate-100 placeholder:text-slate-600 focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400;
+  }
+  .adm-btn-hijau {
+    @apply adm-btn border-emerald-500 bg-emerald-500 text-slate-950 hover:bg-emerald-400;
+  }
+  .adm-btn-merah {
+    @apply adm-btn border-red-500/60 text-red-300 hover:bg-red-500/10;
+  }
+  .adm-btn-abu {
+    @apply adm-btn border-slate-600 text-slate-300 hover:bg-slate-800;
+  }
+  .adm-badge-menunggu {
+    @apply adm-badge border-amber-500/40 bg-amber-500/10 text-amber-300;
+  }
+  .adm-badge-diproses {
+    @apply adm-badge border-sky-500/40 bg-sky-500/10 text-sky-300;
+  }
+  .adm-badge-disetujui {
+    @apply adm-badge border-emerald-500/40 bg-emerald-500/10 text-emerald-300;
+  }
+  .adm-badge-ditolak {
+    @apply adm-badge border-slate-500/40 bg-slate-500/10 text-slate-400;
+  }
+}

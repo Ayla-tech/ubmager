@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(judul)">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="${judul} + ' | OFFER'">OFFER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/output.css}" />
+</head>
+<body>
+
+<!-- ===== Navbar ===== -->
+<header th:fragment="navbar(aktif)" class="sticky top-0 z-30 border-b border-stone-200/80 bg-white/85 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+    <div class="flex items-center gap-6">
+      <a th:href="@{/}" class="flex items-center gap-2">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-lg font-extrabold text-white shadow-sm">O</span>
+        <span class="text-lg font-extrabold tracking-tight text-ink">OFFER</span>
+      </a>
+      <nav class="hidden items-center gap-1 sm:flex">
+        <a th:href="@{/}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+           th:classappend="${aktif == 'beranda'} ? 'text-brand-600' : 'text-stone-600'">Beranda</a>
+        <a th:if="${sesi.login()}" th:href="@{/pesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+           th:classappend="${aktif == 'pesanan'} ? 'text-brand-600' : 'text-stone-600'">Pesanan Saya</a>
+
+        <a th:if="${sesi.login()}" th:href="@{/keranjang}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'keranjang'} ? 'text-brand-600' : 'text-stone-600'">Keranjang</a>
+<a th:if="${sesi.login()}" th:href="@{/riwayat}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'riwayat'} ? 'text-brand-600' : 'text-stone-600'">Riwayat</a>
+<a th:if="${sesi.login()}" th:href="@{/pemesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'pemesanan'} ? 'text-brand-600' : 'text-stone-600'">Pemesanan</a>
+<a th:if="${sesi.login()}" th:href="@{/pembayaran}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'pembayaran'} ? 'text-brand-600' : 'text-stone-600'">Pembayaran</a>
+<a th:if="${sesi.login()}" th:href="@{/chat}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'chat'} ? 'text-brand-600' : 'text-stone-600'">Chat</a>
+<a th:if="${sesi.login()}" th:href="@{/notifikasi}" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'notifikasi'} ? 'text-brand-600' : 'text-stone-600'">
+    <span>Notifikasi</span>
+    <span th:if="${belumDibaca != null and belumDibaca > 0}"
+          class="rounded-full bg-brand-600 px-1.5 py-0.5 text-[11px] font-bold leading-none text-white"
+          th:text="${belumDibaca}">1</span>
+</a>
+
+      </nav>
+    </div>
+
+    <div th:if="${!sesi.login()}" class="flex items-center gap-2">
+      <a th:href="@{/login}" class="btn-ghost btn-sm">Masuk</a>
+      <a th:href="@{/daftar}" class="btn-primary btn-sm">Daftar</a>
+    </div>
+
+    <details th:if="${sesi.login()}" class="relative">
+      <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-stone-200 bg-white py-1 pl-1 pr-3 hover:border-brand-300">
+        <span class="avatar h-8 w-8 text-xs" th:text="${sesi.inisial()}">AB</span>
+        <span class="max-w-[9rem] truncate text-sm font-semibold text-stone-700" th:text="${sesi.nama()}">Nama</span>
+      </summary>
+      <div class="absolute right-0 mt-2 w-56 rounded-xl border border-stone-200 bg-white p-1.5 shadow-lg">
+        <a th:href="@{/profil}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50">Profil Saya</a>
+        <a th:href="@{/kelola-postingan}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50">Kelola Postingan</a>
+        <a th:href="@{/pesanan}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Pesanan Saya</a>
+        <a th:href="@{/keranjang}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Keranjang</a>
+        <a th:href="@{/riwayat}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Riwayat Transaksi</a>
+        <a th:href="@{/pemesanan}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Pemesanan</a>
+        <a th:href="@{/pembayaran}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Pembayaran</a>
+        <a th:href="@{/chat}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Chat</a>
+        <a th:href="@{/notifikasi}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Notifikasi</a>
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="w-full cursor-pointer rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50">Keluar</button>
+        </form>
+      </div>
+    </details>
+  </div>
+</header>
+
+<!-- ===== Alert (pesan sukses / error) ===== -->
+<div th:fragment="alert">
+  <div th:if="${pesanSukses}" class="alert-sukses" role="status" th:text="${pesanSukses}">Berhasil</div>
+  <div th:if="${pesanError}" class="alert-error" role="alert" th:text="${pesanError}">Gagal</div>
+</div>
+
+<!-- ===== Bintang rating (n = 0..5) ===== -->
+<span th:fragment="bintang(n)" class="stars">
+  <span th:each="i : ${#numbers.sequence(1, 5)}" th:classappend="${i le n} ? 'on' : 'off'">&#9733;</span>
+</span>
+
+<!-- ===== Satu review. kembali = alamat tujuan setelah laporan dikirim ===== -->
+<article th:fragment="reviewItem(r, dilapor, kembali, bisaLapor)" class="rounded-xl border border-stone-200 bg-white p-4">
+  <div class="flex items-start gap-3">
+    <span class="avatar h-10 w-10 text-sm" th:text="${r.inisial()}">AB</span>
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <a th:href="@{/pengguna/{id}(id=${r.idReviewer()})}" class="text-sm font-bold text-ink hover:text-brand-600" th:text="${r.namaReviewer()}">Nama</a>
+        <span th:replace="~{fragments/base :: bintang(${r.rating()})}"></span>
+        <span class="text-xs text-stone-500" th:text="${r.tanggal()}">1 Jan 2026</span>
+      </div>
+      <p th:if="${r.komentar() != null and !r.komentar().isBlank()}" class="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-stone-700" th:text="${r.komentar()}">Komentar</p>
+      <p th:if="${r.komentar() == null or r.komentar().isBlank()}" class="mt-1.5 text-sm italic text-stone-400">Tidak ada komentar</p>
+
+      <div th:if="${bisaLapor}" class="mt-2">
+        <span th:if="${dilapor}" class="text-xs font-semibold text-stone-400">Sudah dilaporkan</span>
+        <details th:unless="${dilapor}">
+          <summary class="cursor-pointer text-xs font-semibold text-stone-500 hover:text-red-600">Laporkan review ini</summary>
+          <form th:action="@{/review/laporan}" method="post" class="mt-2 space-y-2">
+            <input type="hidden" name="idReview" th:value="${r.idReview()}" />
+            <input type="hidden" name="kembali" th:value="${kembali}" />
+            <textarea name="alasan" rows="2" required maxlength="500" class="input" placeholder="Jelaskan alasan laporanmu"></textarea>
+            <button type="submit" class="btn-danger btn-sm">Kirim laporan</button>
+          </form>
+        </details>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ===== Panel kiri halaman login/daftar ===== -->
+<aside th:fragment="authPanel" class="relative hidden overflow-hidden bg-gradient-to-br from-brand-500 to-brand-700 p-10 text-white md:flex md:flex-col md:justify-between">
+  <a th:href="@{/}" class="flex items-center gap-2">
+    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-xl font-extrabold">O</span>
+    <span class="text-xl font-extrabold tracking-tight">OFFER</span>
+  </a>
+  <div>
+    <h2 class="text-3xl font-extrabold leading-tight">Tawarkan yang kamu bisa.<br />Temukan yang kamu butuh.</h2>
+    <ul class="mt-6 space-y-3 text-sm text-brand-50">
+      <li class="flex items-center gap-2"><span class="text-amber-200">&#9733;</span> Review dari pembeli yang benar-benar bertransaksi</li>
+      <li class="flex items-center gap-2"><span class="text-amber-200">&#9733;</span> Badge kepercayaan untuk penjual terbaik</li>
+      <li class="flex items-center gap-2"><span class="text-amber-200">&#9733;</span> Laporkan review yang tidak adil</li>
+    </ul>
+  </div>
+  <p class="text-xs text-brand-100">&copy; OFFER</p>
+  <div class="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10"></div>
+  <div class="pointer-events-none absolute -bottom-20 -left-10 h-60 w-60 rounded-full bg-white/10"></div>
+</aside>
+
+<!-- ===== Footer ===== -->
+<footer th:fragment="footer" class="border-t border-stone-200 bg-white">
+  <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-stone-500 sm:flex-row">
+    <span>&copy; OFFER. Marketplace jasa dan barang.</span>
+    <a th:href="@{/admin/login}" class="hover:text-brand-600">Masuk admin</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Pesanan Saya')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('pesanan')}"></header>
+
+<main class="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+  <h1 class="text-2xl font-extrabold">Pesanan saya</h1>
+  <p class="mb-6 mt-1 text-sm text-stone-500">Beri review untuk pesanan yang sudah selesai.</p>
+
+  <div th:if="${#lists.isEmpty(daftarPesanan)}" class="card text-center text-sm text-stone-500">Kamu belum punya pesanan.</div>
+
+  <div class="space-y-3">
+    <article th:each="p : ${daftarPesanan}" class="card flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <h2 class="font-bold" th:text="${p.judul()}">Judul</h2>
+          <span th:class="'badge-' + ${p.status()}" th:text="${p.status()}">selesai</span>
+        </div>
+        <p class="mt-1 text-sm text-stone-500">
+          <span th:text="${p.idPesanan()}">PSN001</span> &middot;
+          <a th:if="${!p.idPenjual().isEmpty()}" th:href="@{/pengguna/{id}(id=${p.idPenjual()})}" class="font-semibold text-stone-700 hover:text-brand-600" th:text="${p.namaPenjual()}">Penjual</a>
+          &middot; <span th:text="${p.harga()}">Rp 0</span>
+        </p>
+      </div>
+      <div class="shrink-0">
+        <a th:if="${p.status() == 'selesai' and !p.sudahReview()}" th:href="@{/review/baru(idPesanan=${p.idPesanan()})}" class="btn-primary btn-sm">Beri review</a>
+        <span th:if="${p.sudahReview()}" class="badge-selesai">Sudah direview</span>
+      </div>
+    </article>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>

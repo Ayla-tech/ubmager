@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head(${profil.nama()})}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('')}"></header>
+
+<main class="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+  <div th:replace="~{fragments/profil :: header(${profil}, false)}"></div>
+
+  <h2 class="mb-3 mt-8 text-lg font-extrabold">Review untuk <span th:text="${profil.nama()}">Nama</span></h2>
+  <p th:if="${!sesi.login()}" class="mb-3 text-sm text-stone-500"><a th:href="@{/login}" class="font-semibold text-brand-600 hover:underline">Masuk</a> untuk melaporkan review yang tidak sesuai.</p>
+
+  <div th:if="${#lists.isEmpty(daftarReview)}" class="card text-center text-sm text-stone-500">Belum ada review.</div>
+  <div class="space-y-3">
+    <th:block th:each="r : ${daftarReview}">
+      <div th:replace="~{fragments/base :: reviewItem(${r}, ${sudahDilapor.contains(r.idReview())}, '/pengguna/' + ${profil.idUser()}, ${sesi.login()})}"></div>
+    </th:block>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>

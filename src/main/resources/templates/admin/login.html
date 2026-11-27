@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Admin')}"></head>
+<body class="flex min-h-screen items-center justify-center bg-slate-950 px-6 font-mono text-slate-200">
+  <div class="w-full max-w-sm">
+    <p class="text-xs uppercase tracking-[0.3em] text-emerald-400">OFFER // ADMIN CONSOLE</p>
+    <h1 class="mt-2 text-2xl font-semibold text-white">Masuk admin</h1>
+    <p class="mb-6 mt-1 text-xs text-slate-500">Area terbatas. Hanya untuk pengelola.</p>
+
+    <div th:if="${pesanError}" class="mb-4 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300" th:text="${pesanError}">Gagal</div>
+
+    <form th:action="@{/admin/login}" method="post" class="adm-card space-y-4">
+      <div>
+        <label for="username" class="mb-1.5 block text-xs uppercase tracking-wider text-slate-400">Username</label>
+        <input id="username" name="username" type="text" required autofocus autocomplete="username" class="adm-input" th:value="${username}" />
+      </div>
+      <div>
+        <label for="password" class="mb-1.5 block text-xs uppercase tracking-wider text-slate-400">Password</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password" class="adm-input" />
+      </div>
+      <button type="submit" class="adm-btn-hijau w-full py-2.5">Masuk</button>
+    </form>
+
+    <a th:href="@{/}" class="mt-6 block text-center text-xs text-slate-500 hover:text-emerald-400">&larr; kembali ke situs</a>
+  </div>
+</body>
+</html>

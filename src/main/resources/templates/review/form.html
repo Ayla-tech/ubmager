@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Beri Review')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('pesanan')}"></header>
+
+<main class="mx-auto w-full max-w-xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+  <a th:href="@{/pesanan}" class="text-sm font-semibold text-stone-500 hover:text-brand-600">&larr; Kembali ke pesanan</a>
+
+  <section class="card mt-3">
+    <h1 class="text-2xl font-extrabold">Beri review</h1>
+    <p class="mt-1 text-sm text-stone-500">
+      <strong class="text-ink" th:text="${pesanan.judul()}">Judul</strong> dari
+      <strong class="text-ink" th:text="${pesanan.namaPenjual()}">Penjual</strong>
+    </p>
+
+    <form th:action="@{/review}" method="post" class="mt-6 space-y-5">
+      <input type="hidden" name="idPesanan" th:value="${pesanan.idPesanan()}" />
+
+      <div>
+        <span class="label">Rating</span>
+        <div class="star-input">
+          <input type="radio" id="r5" name="rating" value="5" required /><label for="r5" title="5 bintang">&#9733;</label>
+          <input type="radio" id="r4" name="rating" value="4" /><label for="r4" title="4 bintang">&#9733;</label>
+          <input type="radio" id="r3" name="rating" value="3" /><label for="r3" title="3 bintang">&#9733;</label>
+          <input type="radio" id="r2" name="rating" value="2" /><label for="r2" title="2 bintang">&#9733;</label>
+          <input type="radio" id="r1" name="rating" value="1" /><label for="r1" title="1 bintang">&#9733;</label>
+        </div>
+      </div>
+
+      <div>
+        <label for="komentar" class="label">Komentar (opsional)</label>
+        <textarea id="komentar" name="komentar" rows="4" maxlength="1000" class="input" placeholder="Ceritakan pengalamanmu"></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary w-full">Kirim review</button>
+    </form>
+  </section>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>

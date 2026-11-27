@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Verifikasi OTP')}"></head>
+<body class="min-h-screen">
+<div class="grid min-h-screen md:grid-cols-2">
+  <aside th:replace="~{fragments/base :: authPanel}"></aside>
+
+  <main class="flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm">
+      <h1 class="text-2xl font-extrabold">Verifikasi kode OTP</h1>
+      <p class="mb-6 mt-1 text-sm text-stone-500">Masukkan 6 digit kode yang dikirim ke <strong class="text-ink" th:text="${kontak}">kontak</strong>. Kode berlaku 5 menit.</p>
+
+      <div th:replace="~{fragments/base :: alert}"></div>
+
+      <div th:if="${kodeDemo}" class="mb-5 rounded-xl border border-dashed border-amber-400 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Mode demo. Kode OTP kamu: <strong class="font-mono text-base tracking-widest" th:text="${kodeDemo}">123456</strong>
+      </div>
+
+      <form th:action="@{/daftar/verifikasi}" method="post" class="space-y-4">
+        <div>
+          <label for="kode" class="label">Kode OTP</label>
+          <input id="kode" name="kode" type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required autofocus
+                 class="input text-center font-mono text-2xl tracking-[0.5em]" />
+        </div>
+        <button type="submit" class="btn-primary w-full">Verifikasi dan buat akun</button>
+      </form>
+
+      <form th:action="@{/daftar/kirim-ulang}" method="post" class="mt-4 text-center">
+        <button type="submit" class="cursor-pointer text-sm font-semibold text-brand-600 hover:underline">Kirim ulang kode</button>
+      </form>
+      <p class="mt-4 text-center text-sm"><a th:href="@{/daftar}" class="text-stone-500 hover:text-brand-600">Ubah data pendaftaran</a></p>
+    </div>
+  </main>
+</div>
+</body>
+</html>
