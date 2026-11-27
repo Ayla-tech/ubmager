@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Kelola Postingan')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('beranda')}"></header>
+
+<main id="mainKelola"
+      th:data-id-user="${sesi.login() ? sesi.idUser() : ''}"
+      class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <div th:if="${!sesi.login()}" class="card text-center text-sm text-stone-600">
+    Silakan <a th:href="@{/login}" class="font-bold text-brand-600 underline">masuk</a> terlebih dahulu untuk mengelola postingan.
+  </div>
+
+  <div th:if="${sesi.login()}">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-extrabold text-ink">Kelola Penawaran Saya</h1>
+        <p class="text-sm text-stone-500">Buat, perbarui, atau hapus penawaran jasa dan barang kamu.</p>
+      </div>
+      <button onclick="bukaBuat()" class="btn-primary">+ Buat Postingan</button>
+    </div>
+
+    <div id="infoPesan" class="mb-5 hidden rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900"></div>
+
+    <form id="formPostingan" onsubmit="simpan(event)" class="card mb-8 hidden p-6">
+      <h2 id="judulForm" class="mb-4 text-lg font-bold">Buat Penawaran Baru</h2>
+      <input type="hidden" id="idPostingan">
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-xs font-bold text-stone-600">Judul Penawaran</label>
+          <input type="text" id="judul" required maxlength="100" class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-bold text-stone-600">Kategori</label>
+          <select id="kategori" class="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm">
+            <option value="Transportasi">Transportasi</option>
+            <option value="Jasa Titip">Jasa Titip</option>
+            <option value="Les dan Bimbingan">Les dan Bimbingan</option>
+            <option value="Desain & Kreatif">Desain & Kreatif</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-bold text-stone-600">Harga (Rp)</label>
+          <input type="number" id="harga" required min="1" class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-bold text-stone-600">Batas Jam Tayang</label>
+          <input type="datetime-local" id="jamTayang" required class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm">
+        </div>
+        <div class="md:col-span-2">
+          <label class="mb-1 block text-xs font-bold text-stone-600">Deskripsi</label>
+          <textarea id="deskripsi" rows="3" required class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm"></textarea>
+        </div>
+      </div>
+      <div class="mt-5 flex gap-2">
+        <button type="submit" class="btn-primary">Simpan</button>
+        <button type="button" onclick="tutupForm()" class="btn border border-stone-300 bg-white text-stone-700">Batal</button>
+      </div>
+    </form>
+
+    <div id="daftarPostingan" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+
+<script>
+  let modeEdit = false;
+
+  function getIdPenjual() {
+    return document.getElementById("mainKelola").dataset.idUser || "";
+  }
+
+  function tampilkanPesan(teks) {
+    const el = document.getElementById("infoPesan");
+    el.textContent = teks;
+    el.classList.remove("hidden");
+  }
+
+  function bukaBuat() {
+    modeEdit = false;
+    document.getElementById("judulForm").textContent = "Buat Penawaran Baru";
+    document.getElementById("formPostingan").reset();
+    document.getElementById("idPostingan").value = "";
+    document.getElementById("formPostingan").classList.remove("hidden");
+  }
+
+  function bukaEdit(item) {
+    modeEdit = true;
+    document.getElementById("judulForm").textContent = "Perbarui Penawaran";
+    document.getElementById("idPostingan").value = item.idPostingan;
+    document.getElementById("judul").value = item.judul;
+    document.getElementById("kategori").value = item.kategori;
+    document.getElementById("harga").value = item.harga;
+    document.getElementById("jamTayang").value = (item.jamTayang || "").slice(0, 16);
+    document.getElementById("deskripsi").value = item.deskripsi;
+    document.getElementById("formPostingan").classList.remove("hidden");
+  }
+
+  function tutupForm() {
+    document.getElementById("formPostingan").classList.add("hidden");
+  }
+
+  async function muatData() {
+    const idPenjual = getIdPenjual();
+    if (!idPenjual) return;
+
+    const res = await fetch(`/api/postingan/penjual/${idPenjual}`);
+    const json = await res.json();
+    const wadah = document.getElementById("daftarPostingan");
+    wadah.innerHTML = "";
+
+    if (!json.berhasil || !json.data || json.data.length === 0) {
+      wadah.innerHTML = `<div class="card col-span-full text-center text-sm text-stone-500">Belum ada postingan penawaran.</div>`;
+      return;
+    }
+
+    json.data.forEach(item => {
+      wadah.innerHTML += `
+        <article class="card flex flex-col justify-between p-5">
+          <div>
+            <div class="mb-3 flex items-center justify-between">
+              <span class="badge bg-brand-100 text-brand-700">${item.kategori}</span>
+              <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ${item.statusAktif ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}">
+                ${item.statusAktif ? "Aktif" : "Nonaktif"}
+              </span>
+            </div>
+            <h3 class="text-base font-bold text-ink">${item.judul}</h3>
+            <p class="mt-1.5 text-sm text-stone-600">${item.deskripsi}</p>
+            <p class="mt-3 text-lg font-extrabold text-brand-600">Rp ${Number(item.harga).toLocaleString("id-ID")}</p>
+            <p class="mt-1 text-xs text-stone-400">Tayang s/d: ${(item.jamTayang || "").replace("T", " ")}</p>
+          </div>
+          <div class="mt-4 flex justify-end gap-2 border-t border-stone-100 pt-3">
+            <button onclick='bukaEdit(${JSON.stringify(item)})' class="btn btn-sm border border-stone-300 bg-white text-stone-700">Ubah</button>
+            <button onclick="hapus('${item.idPostingan}')" class="btn btn-sm border border-red-200 bg-red-50 text-red-600">Hapus</button>
+          </div>
+        </article>
+      `;
+    });
+  }
+
+  async function simpan(e) {
+    e.preventDefault();
+    const idPost = document.getElementById("idPostingan").value;
+    const jt = document.getElementById("jamTayang").value;
+    const url = modeEdit ? `/api/postingan/${idPost}` : "/api/postingan/buat";
+    const method = modeEdit ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_penjual: getIdPenjual(),
+        judul: document.getElementById("judul").value.trim(),
+        kategori: document.getElementById("kategori").value,
+        harga: Number(document.getElementById("harga").value),
+        jam_tayang: jt.length === 16 ? `${jt}:00` : jt,
+        deskripsi: document.getElementById("deskripsi").value.trim()
+      })
+    });
+    const json = await res.json();
+    tampilkanPesan(json.pesan);
+    if (json.berhasil) {
+      tutupForm();
+      muatData();
+    }
+  }
+
+  async function hapus(idPostingan) {
+    const res = await fetch(`/api/postingan/${idPostingan}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id_penjual: getIdPenjual() })
+    });
+    const json = await res.json();
+    tampilkanPesan(json.pesan);
+    if (json.berhasil) muatData();
+  }
+
+  muatData();
+</script>
+</body>
+</html>

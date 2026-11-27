@@ -187,11 +187,28 @@ public class HalamanKeranjangController {
                 Map.of("id_postingan", idPostingan, "jumlah", jumlah), session, ra, true);
     }
 
+    // Checkout: KeranjangController membuat satu pemesanan untuk setiap produk yang
+    // dicentang. Di sini pembeli diarahkan ke halaman pemesanan untuk menunggu
+    // penyedia menerima pesanan, lalu lanjut ke pembayaran.
     @PostMapping("/checkout")
     public String checkout(HttpSession session, RedirectAttributes ra) {
-        // TODO: setelah halaman pembayaran (fitur MI) siap, arahkan redirect ke sana
-        // saat berhasil
-        return jalankan("CHECKOUT", Map.of(), session, ra, true);
+        String idUser = idUser(session);
+        if (idUser == null) {
+            return "redirect:/login";
+        }
+        Hasil hasil = keranjangController.prosesKeranjang("CHECKOUT", idUser, Map.of());
+        if (!hasil.berhasil()) {
+            ra.addFlashAttribute("pesanError", hasil.pesan());
+            return "redirect:/keranjang?lanjut=1";
+        }
+
+        ra.addFlashAttribute("pesanSukses", hasil.pesan());
+        // Satu pesanan: langsung ke detailnya. Beberapa pesanan: ke daftar pemesanan.
+        List<?> daftar = (List<?>) hasil.data();
+        if (daftar.size() == 1) {
+            return "redirect:/pemesanan/" + ((Map<?, ?>) daftar.get(0)).get("id_pemesanan");
+        }
+        return "redirect:/pemesanan";
     }
 
     // Menjalankan aksi di KeranjangController lalu kembali ke halaman keranjang

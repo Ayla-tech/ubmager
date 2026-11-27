@@ -3,6 +3,7 @@ package com.example.ubmager.controller;
 import com.example.ubmager.controller.HalamanRiwayatController.KartuTransaksi;
 import com.example.ubmager.entity.Transaksi;
 import com.example.ubmager.repository.TransaksiRepository;
+import com.example.ubmager.service.TransaksiService;
 import jakarta.servlet.http.HttpSession;
 import java.net.URI;
 import java.text.NumberFormat;
@@ -34,11 +35,14 @@ public class HalamanRiwayatController {
     private static final DateTimeFormatter TAMPIL_LENGKAP = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm", ID);
     private final RiwayatController riwayatController;
     private final TransaksiRepository transaksiRepository;
+    private final TransaksiService transaksiService;
 
     public HalamanRiwayatController(RiwayatController riwayatController,
-            TransaksiRepository transaksiRepository) {
+            TransaksiRepository transaksiRepository,
+            TransaksiService transaksiService) {
         this.riwayatController = riwayatController;
         this.transaksiRepository = transaksiRepository;
+        this.transaksiService = transaksiService;
     }
 
     // Halaman riwayat: tab peran, pencarian kata kunci, dan filter kategori
@@ -51,6 +55,8 @@ public class HalamanRiwayatController {
         if (idUser == null) {
             return "redirect:/login";
         }
+        // Catat pesanan yang baru selesai (dari modul pemesanan dan pembayaran) ke tabel transaksi
+        transaksiService.sinkronDariPesananSelesai();
         boolean penjual = peran.equalsIgnoreCase("penjual");
         kategori = kategori.trim();
         q = q.trim();
@@ -69,7 +75,7 @@ public class HalamanRiwayatController {
                 rupiah(t.getTotalHarga()), t.getTanggalTransaksi().format(TAMPIL),
                 t.getTanggalTransaksi().format(TAMPIL_LENGKAP),
                 t.getStatusTransaksi(), label(t.getStatusTransaksi()))).toList();
-                
+
         model.addAttribute("peran", penjual ? "penjual" : "pembeli");
         model.addAttribute("kategori", kategori);
         model.addAttribute("q", q);

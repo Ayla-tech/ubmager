@@ -11,6 +11,7 @@ import com.example.ubmager.repository.UserRepository;
 import com.example.ubmager.util.IdGenerator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,17 +30,20 @@ public class KeranjangController {
     private final KeranjangRepository keranjangRepository;
     private final ProdukKeranjangRepository produkKeranjangRepository;
     private final PostinganRepository postinganRepository;
+    private final PemesananController pemesananController;
     private final IdGenerator idGenerator;
 
     public KeranjangController(UserRepository userRepository,
             KeranjangRepository keranjangRepository,
             ProdukKeranjangRepository produkKeranjangRepository,
             PostinganRepository postinganRepository,
+            PemesananController pemesananController,
             IdGenerator idGenerator) {
         this.userRepository = userRepository;
         this.keranjangRepository = keranjangRepository;
         this.produkKeranjangRepository = produkKeranjangRepository;
         this.postinganRepository = postinganRepository;
+        this.pemesananController = pemesananController;
         this.idGenerator = idGenerator;
     }
 
@@ -220,13 +224,49 @@ public class KeranjangController {
                 return new Hasil(false, "Peringatan: Produk tidak tersedia",
                         ringkasan(idKeranjang, peringatan));
             }
-            return new Hasil(true, "Checkout dapat dilanjutkan ke proses pembayaran",
-                    ringkasan(idKeranjang, peringatan));
+                        // Setiap produk terpilih menjadi satu pemesanan (pesanan dan pemesanan berstatus menunggu)
+            List<ProdukKeranjang> berhasilDipesan = new ArrayList<>();
+            List<Map<String, Object>> daftarPemesanan = new ArrayList<>();
+            List<String> daftarGagal = new ArrayList<>();
+            for (ProdukKeranjang item : terpilih) {
+                Map<String, Object> body = new HashMap<>();
+                body.put("id_pembeli", idUser);
+                body.put("id_postingan", item.getIdPostingan());
+                body.put("jumlah", item.getJumlah());
+                if (item.getJadwal() != null) {
+                    body.put("waktu_pesanan", item.getJadwal().toString());
+                }
+                body.put("lokasi", item.getLokasi() == null ? "" : item.getLokasi());
+                body.put("catatan", item.getCatatan() == null ? "" : item.getCatatan());
+
+                Hasil hasilPesan = pemesananController.buat(body).getBody();
+                if (hasilPesan != null && hasilPesan.berhasil()) {
+                    berhasilDipesan.add(item);
+                    daftarPemesanan.add(ambilPemesanan(hasilPesan.data()));
+                } else {
+                    daftarGagal.add(hasilPesan == null ? "Pemesanan gagal" : hasilPesan.pesan());
+                }
+            }
+            if (berhasilDipesan.isEmpty()) {
+                return new Hasil(false, "Checkout gagal: " + daftarGagal.get(0), null);
+            }
+
+            // Hanya produk yang berhasil dipesan yang keluar dari keranjang
+            produkKeranjangRepository.deleteAll(berhasilDipesan);
+            perbaruiWaktu(keranjang);
+
+            String pesan = berhasilDipesan.size()
+                    + " pesanan dibuat. Tunggu penyedia menerima pesanan, lalu lanjut ke pembayaran.";
+            if (!daftarGagal.isEmpty()) {
+                pesan += " " + daftarGagal.size() + " produk gagal dipesan dan tetap di keranjang.";
+            }
+            return new Hasil(true, pesan, daftarPemesanan);
         }
         return new Hasil(false, "Aksi tidak valid", null);
     }
 
-    // Method untuk menghitung total biaya dan total porsi produk yang dipilih dan tersedia
+    // Method untuk menghitung total biaya dan total porsi produk yang dipilih dan
+    // tersedia
     public double[] hitungTotal(String idKeranjang) {
         double totalBiaya = 0;
         double totalPorsi = 0;
@@ -289,6 +329,11 @@ public class KeranjangController {
         return hasil;
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> ambilPemesanan(Object data) {
+        return (Map<String, Object>) ((Map<String, Object>) data).get("pemesanan");
+    }
+
     private void perbaruiWaktu(Keranjang keranjang) {
         keranjang.setUpdatedAt(LocalDateTime.now());
         keranjangRepository.save(keranjang);
@@ -301,7 +346,7 @@ public class KeranjangController {
 
     private boolean aktif(Postingan post) {
         return post.isStatusAktif()
-            && post.getJamTayang().isAfter(LocalDateTime.now());
+                && post.getJamTayang().isAfter(LocalDateTime.now());
     }
 
     private int angka(Map<String, Object> data, String kunci, int bawaan) {

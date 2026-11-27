@@ -4,7 +4,10 @@
 <body class="flex min-h-screen flex-col">
 <header th:replace="~{fragments/base :: navbar('beranda')}"></header>
 
-<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+<main id="mainBeranda"
+      th:data-login="${sesi.login()}"
+      th:data-id-user="${sesi.login() ? sesi.idUser() : ''}"
+      class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
   <div th:replace="~{fragments/base :: alert}"></div>
 
   <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 px-8 py-12 text-white shadow-sm">
@@ -15,7 +18,8 @@
       <a th:href="@{/login}" class="btn border border-white/40 text-white hover:bg-white/10">Masuk</a>
     </div>
     <div th:if="${sesi.login()}" class="mt-6 flex flex-wrap gap-3">
-      <a th:href="@{/pesanan}" class="btn bg-white text-brand-700 hover:bg-brand-50">Lihat pesanan saya</a>
+      <a th:href="@{/kelola-postingan}" class="btn bg-white text-brand-700 hover:bg-brand-50">Kelola Postingan</a>
+      <a th:href="@{/pesanan}" class="btn border border-white/40 text-white hover:bg-white/10">Lihat pesanan saya</a>
       <a th:href="@{/keranjang}" class="btn border border-white/40 text-white hover:bg-white/10">Keranjang</a>
       <a th:href="@{/riwayat}" class="btn border border-white/40 text-white hover:bg-white/10">Riwayat Transaksi</a>
       <a th:href="@{/chat}" class="btn border border-white/40 text-white hover:bg-white/10">Buka Chat</a>
@@ -24,11 +28,51 @@
     <div class="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-white/10"></div>
   </section>
 
-  <h2 class="mb-4 mt-10 text-xl font-extrabold">Penawaran terbaru</h2>
+  <!-- Search & Filter -->
+  <section class="card mt-6 p-4">
+    <form onsubmit="cariPenawaran(event)" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-4">
+        <label for="kataKunci" class="mb-1 block text-xs font-bold text-stone-600">Kata Kunci</label>
+        <input type="text" id="kataKunci" placeholder="Cari jasa atau barang..."
+               class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+      </div>
+      <div class="lg:col-span-3">
+        <label for="filterKategori" class="mb-1 block text-xs font-bold text-stone-600">Kategori</label>
+        <select id="filterKategori"
+                class="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+          <option value="">Semua Kategori</option>
+          <option value="Transportasi">Transportasi</option>
+          <option value="Jasa Titip">Jasa Titip</option>
+          <option value="Les dan Bimbingan">Les dan Bimbingan</option>
+          <option value="Desain & Kreatif">Desain &amp; Kreatif</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-2 lg:col-span-3">
+        <div>
+          <label for="hargaMin" class="mb-1 block text-xs font-bold text-stone-600">Min (Rp)</label>
+          <input type="number" id="hargaMin" min="0" placeholder="0"
+                 class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+        </div>
+        <div>
+          <label for="hargaMax" class="mb-1 block text-xs font-bold text-stone-600">Max (Rp)</label>
+          <input type="number" id="hargaMax" min="0" placeholder="100000"
+                 class="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+        </div>
+      </div>
+      <div class="flex gap-2 lg:col-span-2">
+        <button type="submit" class="btn-primary w-full justify-center">Cari</button>
+        <button type="button" onclick="resetFilter()" class="btn border border-stone-300 bg-white text-stone-700 hover:bg-stone-50">Reset</button>
+      </div>
+    </form>
+  </section>
 
-  <div th:if="${#lists.isEmpty(daftarPostingan)}" class="card text-center text-sm text-stone-500">Belum ada penawaran.</div>
+  <h2 class="mb-4 mt-8 text-xl font-extrabold">Penawaran terbaru</h2>
 
-  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <div id="kotakKosong" th:classappend="${#lists.isEmpty(daftarPostingan)} ? '' : 'hidden'" class="card text-center text-sm text-stone-500">
+    Belum ada penawaran.
+  </div>
+
+  <div id="gridPostingan" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
     <article th:each="p : ${daftarPostingan}" class="card flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md">
       <span class="badge w-fit bg-brand-100 text-brand-700" th:text="${p.kategori()}">Kategori</span>
       <h3 class="mt-3 text-base font-bold leading-snug" th:text="${p.judul()}">Judul</h3>
@@ -64,5 +108,98 @@
 </main>
 
 <footer th:replace="~{fragments/base :: footer}"></footer>
+
+<script>
+  function renderBintang(jumlah) {
+    let html = '<span class="text-amber-500">';
+    for (let i = 1; i <= 5; i++) {
+      html += i <= jumlah ? '★' : '☆';
+    }
+    html += '</span>';
+    return html;
+  }
+
+  async function cariPenawaran(e) {
+    if (e) e.preventDefault();
+
+    const kataKunci = document.getElementById("kataKunci").value.trim();
+    const kategori = document.getElementById("filterKategori").value;
+    const hargaMin = document.getElementById("hargaMin").value;
+    const hargaMax = document.getElementById("hargaMax").value;
+
+    if (hargaMin && hargaMax && Number(hargaMax) < Number(hargaMin)) {
+      alert("Harga maksimum tidak boleh lebih kecil dari harga minimum.");
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (kataKunci) params.append("kataKunci", kataKunci);
+    if (kategori) params.append("kategori", kategori);
+    if (hargaMin) params.append("hargaMin", hargaMin);
+    if (hargaMax) params.append("hargaMax", hargaMax);
+
+    const res = await fetch(`/api/pencarian/cari?${params.toString()}`);
+    const json = await res.json();
+
+    const mainEl = document.getElementById("mainBeranda");
+    const sudahLogin = mainEl.dataset.login === "true";
+    const idUserSesi = mainEl.dataset.idUser || "";
+
+    const grid = document.getElementById("gridPostingan");
+    const kosong = document.getElementById("kotakKosong");
+    grid.innerHTML = "";
+
+    if (!json.berhasil || !json.data || json.data.length === 0) {
+      kosong.textContent = "Postingan tidak ditemukan sesuai kriteria pencarian.";
+      kosong.classList.remove("hidden");
+      return;
+    }
+
+    kosong.classList.add("hidden");
+    json.data.forEach(p => {
+      const reviewHtml = p.adaReview
+        ? `<span class="flex items-center gap-1.5">${renderBintang(p.bintang)}<span>${p.ratingTampil}</span></span>`
+        : `<span>Belum ada review</span>`;
+
+      const terpercayaHtml = p.terpercaya ? `<span class="badge-terpercaya">Terpercaya</span>` : "";
+      const aksiHtml = (sudahLogin && idUserSesi !== p.idPenjual)
+        ? `<div class="mt-4 flex gap-2 border-t border-stone-100 pt-3">
+             <a href="/chat/mulai?idPostingan=${p.idPostingan}" class="btn-primary btn-sm flex-1 justify-center">Chat penjual</a>
+             <form action="/keranjang/tambah" method="post" class="flex-1">
+               <input type="hidden" name="idPostingan" value="${p.idPostingan}" />
+               <button type="submit" class="btn-ghost btn-sm w-full justify-center">Simpan ke keranjang</button>
+             </form>
+           </div>`
+        : "";
+
+      grid.innerHTML += `
+        <article class="card flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+          <span class="badge w-fit bg-brand-100 text-brand-700">${p.kategori}</span>
+          <h3 class="mt-3 text-base font-bold leading-snug">${p.judul}</h3>
+          <p class="mt-1.5 line-clamp-2 text-sm text-stone-600">${p.deskripsi}</p>
+          <p class="mt-3 text-lg font-extrabold text-brand-600">${p.harga}</p>
+
+          <a href="/pengguna/${p.idPenjual}" class="mt-4 flex items-center gap-3 border-t border-stone-100 pt-4">
+            <span class="avatar h-10 w-10 text-sm">${p.inisial}</span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-sm font-bold text-ink">${p.namaPenjual}</span>
+              <span class="flex items-center gap-1.5 text-xs text-stone-500">${reviewHtml}</span>
+            </span>
+            ${terpercayaHtml}
+          </a>
+          ${aksiHtml}
+        </article>
+      `;
+    });
+  }
+
+  function resetFilter() {
+    document.getElementById("kataKunci").value = "";
+    document.getElementById("filterKategori").value = "";
+    document.getElementById("hargaMin").value = "";
+    document.getElementById("hargaMax").value = "";
+    cariPenawaran();
+  }
+</script>
 </body>
 </html>

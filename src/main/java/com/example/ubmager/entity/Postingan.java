@@ -7,10 +7,10 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-// Versi minimal. Milik fitur CRUD Post, boleh diganti versi anggota terkait.
 @Entity
 @Table(name = "postingan")
 public class Postingan {
+
     @Id
     @Column(name = "id_postingan", length = 10, nullable = false)
     private String idPostingan;
@@ -24,7 +24,7 @@ public class Postingan {
     @Column(name = "deskripsi", columnDefinition = "TEXT", nullable = false)
     private String deskripsi;
 
-    @Column(name = "harga", nullable = false)
+    @Column(name = "harga", precision = 12, scale = 2, nullable = false)
     private BigDecimal harga;
 
     @Column(name = "kategori", length = 50, nullable = false)
@@ -34,7 +34,7 @@ public class Postingan {
     private LocalDateTime jamTayang;
 
     @Column(name = "status_aktif", nullable = false)
-    private boolean statusAktif;
+    private Boolean statusAktif = true;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -56,8 +56,9 @@ public class Postingan {
     public void setKategori(String kategori) { this.kategori = kategori; }
     public LocalDateTime getJamTayang() { return jamTayang; }
     public void setJamTayang(LocalDateTime jamTayang) { this.jamTayang = jamTayang; }
-    public boolean isStatusAktif() { return statusAktif; }
-    public void setStatusAktif(boolean statusAktif) { this.statusAktif = statusAktif; }
+    public boolean isStatusAktif() { return Boolean.TRUE.equals(statusAktif); }
+    public Boolean getStatusAktif() { return statusAktif; }
+    public void setStatusAktif(Boolean statusAktif) { this.statusAktif = statusAktif; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

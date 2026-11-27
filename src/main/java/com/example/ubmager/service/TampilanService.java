@@ -18,6 +18,7 @@ import com.example.ubmager.repository.PostinganRepository;
 import com.example.ubmager.repository.ProfilRepository;
 import com.example.ubmager.repository.UserRepository;
 import com.example.ubmager.util.Teks;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
-// Menyusun data untuk View (Thymeleaf) dari beberapa tabel
 @Service
 public class TampilanService {
 
@@ -51,9 +51,20 @@ public class TampilanService {
         this.dataLaporanRepository = dataLaporanRepository;
     }
 
-    // ---------- Beranda ----------
+    // ---------- Beranda & Pencarian ----------
     public List<PostinganItem> beranda() {
-        List<Postingan> daftar = postinganRepository.findByStatusAktifTrueOrderByCreatedAtDesc();
+        return susunPostingan(postinganRepository.findByStatusAktifTrueOrderByCreatedAtDesc());
+    }
+
+    public List<PostinganItem> cariPostingan(String kataKunci, String kategori, Double hargaMin, Double hargaMax) {
+        String kw = kataKunci == null ? "" : kataKunci.trim();
+        String kat = kategori == null ? "" : kategori.trim();
+        BigDecimal min = hargaMin != null ? BigDecimal.valueOf(hargaMin) : null;
+        BigDecimal max = hargaMax != null ? BigDecimal.valueOf(hargaMax) : null;
+        return susunPostingan(postinganRepository.cariDenganFilter(kw, kat, min, max));
+    }
+
+    private List<PostinganItem> susunPostingan(List<Postingan> daftar) {
         Set<String> idPenjual = daftar.stream().map(Postingan::getIdPenjual).collect(Collectors.toSet());
         Map<String, User> users = petaUser(idPenjual);
         Map<String, Profil> profil = petaProfil(idPenjual);
@@ -119,7 +130,6 @@ public class TampilanService {
         return susunPesanan(daftar, sudahReview);
     }
 
-    // Null jika pesanan tidak boleh direview oleh user ini
     public PesananItem pesananUntukReview(String idPesanan, String idUser) {
         Pesanan pesanan = pesananRepository.findById(idPesanan).orElse(null);
         if (pesanan == null || !pesanan.getIdPembeli().equals(idUser) || !pesanan.getStatusPesanan().equals("selesai")

@@ -14,6 +14,9 @@ public class Transaksi {
     @Column(name = "id_transaksi", length = 10, nullable = false)
     private String idTransaksi;
 
+    @Column(name = "id_pesanan", length = 10, unique = true)
+    private String idPesanan;
+
     @Column(name = "id_user", length = 10, nullable = false)
     private String idUser;
 
@@ -38,22 +41,83 @@ public class Transaksi {
     @Column(name = "status_transaksi", length = 15, nullable = false)
     private String statusTransaksi;
 
-    public String getIdTransaksi() { return idTransaksi; }
-    public void setIdTransaksi(String idTransaksi) { this.idTransaksi = idTransaksi; }
-    public String getIdUser() { return idUser; }
-    public void setIdUser(String idUser) { this.idUser = idUser; }
-    public String getIdPostingan() { return idPostingan; }
-    public void setIdPostingan(String idPostingan) { this.idPostingan = idPostingan; }
-    public String getJudulPostingan() { return judulPostingan; }
-    public void setJudulPostingan(String judulPostingan) { this.judulPostingan = judulPostingan; }
-    public String getKategori() { return kategori; }
-    public void setKategori(String kategori) { this.kategori = kategori; }
-    public int getJumlah() { return jumlah; }
-    public void setJumlah(int jumlah) { this.jumlah = jumlah; }
-    public double getTotalHarga() { return totalHarga; }
-    public void setTotalHarga(double totalHarga) { this.totalHarga = totalHarga; }
-    public LocalDateTime getTanggalTransaksi() { return tanggalTransaksi; }
-    public void setTanggalTransaksi(LocalDateTime tanggalTransaksi) { this.tanggalTransaksi = tanggalTransaksi; }
-    public String getStatusTransaksi() { return statusTransaksi; }
-    public void setStatusTransaksi(String statusTransaksi) { this.statusTransaksi = statusTransaksi; }
+    public String getIdTransaksi() {
+        return idTransaksi;
+    }
+
+    public void setIdTransaksi(String idTransaksi) {
+        this.idTransaksi = idTransaksi;
+    }
+
+    public String getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(String idUser) {
+        this.idUser = idUser;
+    }
+
+    public String getIdPostingan() {
+        return idPostingan;
+    }
+
+    public void setIdPostingan(String idPostingan) {
+        this.idPostingan = idPostingan;
+    }
+
+    public String getJudulPostingan() {
+        return judulPostingan;
+    }
+
+    public void setJudulPostingan(String judulPostingan) {
+        this.judulPostingan = judulPostingan;
+    }
+
+    public String getKategori() {
+        return kategori;
+    }
+
+    public void setKategori(String kategori) {
+        this.kategori = kategori;
+    }
+
+    public int getJumlah() {
+        return jumlah;
+    }
+
+    public void setJumlah(int jumlah) {
+        this.jumlah = jumlah;
+    }
+
+    public double getTotalHarga() {
+        return totalHarga;
+    }
+
+    public void setTotalHarga(double totalHarga) {
+        this.totalHarga = totalHarga;
+    }
+
+    public LocalDateTime getTanggalTransaksi() {
+        return tanggalTransaksi;
+    }
+
+    public void setTanggalTransaksi(LocalDateTime tanggalTransaksi) {
+        this.tanggalTransaksi = tanggalTransaksi;
+    }
+
+    public String getStatusTransaksi() {
+        return statusTransaksi;
+    }
+
+    public void setStatusTransaksi(String statusTransaksi) {
+        this.statusTransaksi = statusTransaksi;
+    }
+
+    public String getIdPesanan() {
+        return idPesanan;
+    }
+
+    public void setIdPesanan(String idPesanan) {
+        this.idPesanan = idPesanan;
+    }
 }
