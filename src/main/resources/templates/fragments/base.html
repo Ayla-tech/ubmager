@@ -24,6 +24,10 @@
            th:classappend="${aktif == 'beranda'} ? 'text-brand-600' : 'text-stone-600'">Beranda</a>
         <a th:if="${sesi.login()}" th:href="@{/pesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
            th:classappend="${aktif == 'pesanan'} ? 'text-brand-600' : 'text-stone-600'">Pesanan Saya</a>
+        <a th:if="${sesi.login()}" th:href="@{/pemesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+           th:classappend="${aktif == 'pemesanan'} ? 'text-brand-600' : 'text-stone-600'">Pemesanan</a>
+        <a th:if="${sesi.login()}" th:href="@{/pembayaran}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+           th:classappend="${aktif == 'pembayaran'} ? 'text-brand-600' : 'text-stone-600'">Pembayaran</a>
       </nav>
     </div>
 

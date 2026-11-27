@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Bayar Pesanan')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('pembayaran')}"></header>
+
+<main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <a th:href="@{/pemesanan/{id}(id=${pemesanan.idPemesanan()})}" class="text-sm font-semibold text-stone-500 hover:text-brand-600">&larr; Kembali ke detail pemesanan</a>
+  <div class="mt-2">
+    <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Pembayaran</p>
+    <h1 class="mt-1 text-2xl font-extrabold sm:text-3xl">Selesaikan pembayaran</h1>
+    <p class="mt-1 text-sm text-stone-500">Pilih metode, kirim bukti, lalu tunggu konfirmasi penyedia.</p>
+  </div>
+
+  <div class="mt-6 grid items-start gap-6 lg:grid-cols-3">
+    <aside class="lg:col-span-1">
+      <section class="card lg:sticky lg:top-24">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="badge-diterima">Diterima</span>
+          <span class="font-mono text-xs text-stone-400" th:text="${pemesanan.idPesanan()}">PSN000</span>
+        </div>
+        <h2 class="mt-3 text-lg font-extrabold leading-snug" th:text="${pemesanan.judul()}">Judul jasa</h2>
+
+        <dl class="mt-4 space-y-3 border-t border-stone-100 pt-4 text-sm">
+          <div class="flex items-start justify-between gap-4">
+            <dt class="text-stone-500">Penyedia</dt>
+            <dd class="flex max-w-[60%] items-center justify-end gap-2 text-right font-semibold">
+              <span class="avatar h-6 w-6 text-[10px]" th:text="${pemesanan.inisialPenyedia()}">AB</span>
+              <span class="truncate" th:text="${pemesanan.namaPenyedia()}">Nama</span>
+            </dd>
+          </div>
+          <div class="flex items-center justify-between gap-4">
+            <dt class="text-stone-500">Jumlah</dt>
+            <dd class="font-semibold" th:text="${pemesanan.jumlah()}">1</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4">
+            <dt class="text-stone-500">Harga satuan</dt>
+            <dd class="font-semibold" th:text="${pemesanan.hargaSatuan()}">Rp 0</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4 border-t border-stone-100 pt-3">
+            <dt class="font-bold text-stone-700">Total tagihan</dt>
+            <dd class="text-lg font-extrabold text-brand-600" th:text="${pemesanan.total()}">Rp 0</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4">
+            <dt class="text-stone-500">Waktu</dt>
+            <dd class="max-w-[60%] text-right font-semibold" th:text="${pemesanan.waktu()}">-</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4">
+            <dt class="text-stone-500">Lokasi</dt>
+            <dd class="max-w-[60%] text-right font-semibold" th:text="${pemesanan.lokasi()}">-</dd>
+          </div>
+        </dl>
+
+        <a th:href="@{/pemesanan/{id}(id=${pemesanan.idPemesanan()})}" class="btn-ghost btn-sm mt-4 w-full">Lihat detail pemesanan</a>
+      </section>
+    </aside>
+
+    <section class="card lg:col-span-2">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-extrabold">Metode dan bukti</h2>
+          <p class="mt-1 text-xs text-stone-500">Status pembayaran akan menjadi menunggu konfirmasi setelah kamu menekan tombol di bawah.</p>
+        </div>
+        <div class="flex shrink-0 items-center gap-2 text-xs font-bold">
+          <span id="indikatorSatu" class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-white">1</span>
+          <span class="h-px w-4 bg-stone-300" aria-hidden="true"></span>
+          <span id="indikatorDua" class="flex h-7 w-7 items-center justify-center rounded-full bg-stone-100 text-stone-500">2</span>
+        </div>
+      </div>
+
+      <div id="langkahMetode" class="mt-5">
+        <fieldset>
+          <legend class="label">Pilih metode pembayaran</legend>
+          <div class="grid gap-3 sm:grid-cols-3">
+            <label class="metode-kartu flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-brand-300">
+              <input type="radio" name="metode" value="Transfer Bank" class="mt-1 h-4 w-4 accent-brand-500" />
+              <span class="min-w-0">
+                <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-brand-600">TF</span>
+                <span class="mt-0.5 block text-sm font-bold">Transfer Bank</span>
+                <span class="mt-0.5 block text-xs leading-snug text-stone-500">Transfer ke rekening penyedia.</span>
+              </span>
+            </label>
+            <label class="metode-kartu flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-brand-300">
+              <input type="radio" name="metode" value="QRIS" class="mt-1 h-4 w-4 accent-brand-500" />
+              <span class="min-w-0">
+                <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-brand-600">QR</span>
+                <span class="mt-0.5 block text-sm font-bold">QRIS</span>
+                <span class="mt-0.5 block text-xs leading-snug text-stone-500">Pindai kode QRIS penyedia.</span>
+              </span>
+            </label>
+            <label class="metode-kartu flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-brand-300">
+              <input type="radio" name="metode" value="E-Wallet" class="mt-1 h-4 w-4 accent-brand-500" />
+              <span class="min-w-0">
+                <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-brand-600">EW</span>
+                <span class="mt-0.5 block text-sm font-bold">E-Wallet</span>
+                <span class="mt-0.5 block text-xs leading-snug text-stone-500">Kirim ke e-wallet penyedia.</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div id="instruksiPembayaran" class="mt-4 rounded-xl border border-brand-100 bg-brand-50/60 p-4 text-sm text-stone-700" hidden>
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-700">Instruksi</p>
+          <div class="mt-2 space-y-2">
+            <p data-instruksi="Transfer Bank" hidden>Transfer sesuai total tagihan ke rekening yang diberikan penyedia. Simpan bukti transfer sebelum melanjutkan.</p>
+            <p data-instruksi="QRIS" hidden>Pindai QRIS yang diberikan penyedia, pastikan nominal sesuai, lalu simpan bukti transaksi.</p>
+            <p data-instruksi="E-Wallet" hidden>Kirim nominal ke e-wallet penyedia. Simpan tangkapan layar atau tautan bukti transaksi.</p>
+          </div>
+        </div>
+
+        <p class="mt-4 rounded-xl bg-stone-50 px-4 py-3 text-xs leading-relaxed text-stone-600">
+          OFFER belum terhubung ke payment gateway. Tombol <span class="font-semibold">Saya sudah membayar</span> hanya mencatat metode dan status pembayaran; transaksi sebenarnya tetap dilakukan di luar sistem.
+        </p>
+
+        <div id="pesanBayar" class="alert-error mt-4" hidden role="alert"></div>
+
+        <button type="button" id="tombolSudahBayar" class="btn-primary mt-4 w-full" disabled
+                th:attr="data-id-pesanan=${pemesanan.idPesanan()}">Saya sudah membayar</button>
+        <p class="mt-2 text-center text-xs text-stone-500">Tombol aktif setelah kamu memilih metode.</p>
+      </div>
+
+      <div id="langkahBukti" class="mt-5" hidden>
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+          <p class="font-bold">Pembayaran tercatat</p>
+          <p class="mt-1">Nomor pembayaran <span class="font-mono font-bold" id="nomorPembayaran">-</span>. Status saat ini: <span class="font-semibold">menunggu konfirmasi penyedia</span>.</p>
+        </div>
+
+        <form id="formBukti" class="mt-4 space-y-3" novalidate>
+          <div>
+            <label class="label" for="buktiPembayaran">Tautan atau path bukti pembayaran</label>
+            <input id="buktiPembayaran" name="bukti" type="text" maxlength="255" class="input"
+                   placeholder="Contoh: https://contoh.com/bukti-transfer.jpg" />
+            <p class="hint">Belum ada unggah file ke server. Tempel tautan bukti, atau kirim nanti lewat halaman pembayaran.</p>
+          </div>
+
+          <div id="pesanBukti" class="alert-error" hidden role="alert"></div>
+
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <button type="submit" class="btn-primary flex-1">Kirim bukti</button>
+            <a id="lewatiBukti" th:href="@{/pembayaran}" class="btn-outline flex-1 text-center">Kirim nanti</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+<div th:replace="~{fragments/transaksi :: dialog}"></div>
+<script th:src="@{/js/transaksi.js}" defer></script>
+</body>
+</html>

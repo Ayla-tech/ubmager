@@ -93,6 +93,121 @@
         </div>
       </div>
 
+      <!-- 4. Pemesanan -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-700 mb-4">4. Pemesanan</h2>
+        <div class="grid grid-cols-2 gap-4 mb-3">
+          <input id="pmsIdPembeli" type="text" placeholder="ID Pembeli (contoh: USR001)"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input id="pmsIdPostingan" type="text" placeholder="ID Postingan (contoh: PST001)"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input id="pmsJumlah" type="number" min="1" value="1" placeholder="Jumlah"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input id="pmsPenyedia" type="text" placeholder="ID Penyedia (wajib)"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input id="pmsLokasi" type="text" placeholder="Lokasi (opsional)"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input id="pmsCatatan" type="text" placeholder="Catatan (opsional)"
+            class="border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+        </div>
+        <button onclick="buatPemesanan()"
+          class="w-full bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          Buat Pemesanan
+        </button>
+
+        <div class="flex gap-3 mt-4">
+          <input id="pmsIdPemesanan" type="text" placeholder="ID Pemesanan (contoh: PMS001)"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-purple-500 outline-none" />
+          <button onclick="lihatPemesanan()"
+            class="bg-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+            Detail
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 mt-3">
+          <button onclick="aksiPemesanan('terima')"
+            class="bg-emerald-600 text-white font-semibold px-3 py-2 rounded-lg hover:bg-emerald-700 transition">
+            Terima
+          </button>
+          <button onclick="aksiPemesanan('tolak')"
+            class="bg-rose-600 text-white font-semibold px-3 py-2 rounded-lg hover:bg-rose-700 transition">
+            Tolak
+          </button>
+          <button onclick="aksiPemesanan('selesai')"
+            class="bg-slate-700 text-white font-semibold px-3 py-2 rounded-lg hover:bg-slate-800 transition">
+            Selesai
+          </button>
+        </div>
+
+        <div class="flex gap-3 mt-4">
+          <input id="pmsIdDaftar" type="text" placeholder="ID Pembeli / Penyedia"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-slate-500 outline-none" />
+          <button onclick="daftarPemesanan('pembeli')"
+            class="bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-slate-700 transition">
+            Pesanan Pembeli
+          </button>
+          <button onclick="daftarPemesanan('penyedia')"
+            class="bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-slate-700 transition">
+            Pesanan Penyedia
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Pembayaran -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-700 mb-4">5. Pembayaran</h2>
+        <div class="flex gap-3 mb-3">
+          <input id="payIdPesanan" type="text" placeholder="ID Pesanan (contoh: PSN001)"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-green-500 outline-none" />
+          <input id="payMetode" type="text" placeholder="Metode (transfer/tunai)"
+            class="border p-2 rounded w-56 focus:ring-2 focus:ring-green-500 outline-none" />
+          <button onclick="buatPembayaran()"
+            class="bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition">
+            Buat
+          </button>
+        </div>
+
+        <div class="flex gap-3 mb-3">
+          <input id="payIdPembayaran" type="text" placeholder="ID Pembayaran (contoh: PBY001)"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-emerald-500 outline-none" />
+          <input id="payPenyedia" type="text" placeholder="ID Penyedia (wajib)"
+            class="border p-2 rounded w-56 focus:ring-2 focus:ring-emerald-500 outline-none" />
+          <button onclick="lihatPembayaran()"
+            class="bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-emerald-700 transition">
+            Detail
+          </button>
+        </div>
+
+        <div class="flex gap-3 mb-3">
+          <input id="payBukti" type="text" placeholder="URL / path bukti pembayaran"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-teal-500 outline-none" />
+          <button onclick="simpanBukti()"
+            class="bg-teal-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-teal-700 transition">
+            Simpan Bukti
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="aksiPembayaran('konfirmasi')"
+            class="bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg hover:bg-emerald-800 transition">
+            Konfirmasi
+          </button>
+          <button onclick="aksiPembayaran('perbaikan')"
+            class="bg-amber-600 text-white font-semibold px-3 py-2 rounded-lg hover:bg-amber-700 transition">
+            Minta Perbaikan
+          </button>
+        </div>
+
+        <div class="flex gap-3 mt-4">
+          <input id="payCariPesanan" type="text" placeholder="Cari pembayaran berdasarkan ID Pesanan"
+            class="border p-2 rounded flex-1 focus:ring-2 focus:ring-slate-500 outline-none" />
+          <button onclick="cariPembayaranPesanan()"
+            class="bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-slate-700 transition">
+            Cari
+          </button>
+        </div>
+      </div>
+
       <!-- Log Output -->
       <div class="bg-slate-900 rounded-xl shadow-sm overflow-hidden">
         <div class="bg-slate-800 px-4 py-2 border-b border-slate-700">
@@ -190,6 +305,138 @@ Silakan jalankan aksi di atas...</pre
             (err) =>
               (document.getElementById("hasil").innerText = "Error: " + err),
           );
+      }
+
+      // ================= PEMESANAN & PEMBAYARAN =================
+
+      function nilai(id) {
+        return document.getElementById(id).value.trim();
+      }
+
+      function panggilApi(url, method = "GET", payload = null) {
+        document.getElementById("hasil").innerText = "Loading " + url + "...";
+        const opsi = { method };
+        if (payload) {
+          opsi.headers = { "Content-Type": "application/json" };
+          opsi.body = JSON.stringify(payload);
+        }
+        return fetch(url, opsi)
+          .then((res) => res.json())
+          .then((data) => {
+            tampilkanLog(data);
+            return data;
+          })
+          .catch((err) => {
+            document.getElementById("hasil").innerText = "Error: " + err;
+            return null;
+          });
+      }
+
+      function buatPemesanan() {
+        if (!nilai("pmsIdPembeli") || !nilai("pmsIdPostingan")) {
+          alert("ID Pembeli dan ID Postingan wajib diisi!");
+          return;
+        }
+
+        panggilApi("/api/pemesanan", "POST", {
+          id_pembeli: nilai("pmsIdPembeli"),
+          id_postingan: nilai("pmsIdPostingan"),
+          jumlah: parseInt(nilai("pmsJumlah"), 10) || 0,
+          lokasi: nilai("pmsLokasi"),
+          catatan: nilai("pmsCatatan"),
+        }).then((data) => {
+          if (data && data.berhasil && data.data && data.data.pemesanan) {
+            document.getElementById("pmsIdPemesanan").value =
+              data.data.pemesanan.id_pemesanan;
+            document.getElementById("payIdPesanan").value =
+              data.data.pemesanan.id_pesanan;
+          }
+        });
+      }
+
+      function lihatPemesanan() {
+        if (!nilai("pmsIdPemesanan")) {
+          alert("Isi ID Pemesanan dulu!");
+          return;
+        }
+        panggilApi("/api/pemesanan/" + nilai("pmsIdPemesanan"));
+      }
+
+      function aksiPemesanan(aksi) {
+        if (!nilai("pmsIdPemesanan")) {
+          alert("Isi ID Pemesanan dulu!");
+          return;
+        }
+        const method = aksi === "selesai" ? "POST" : "PUT";
+        panggilApi(
+          "/api/pemesanan/" + nilai("pmsIdPemesanan") + "/" + aksi,
+          method,
+          { id_penyedia: nilai("pmsPenyedia") },
+        );
+      }
+
+      function daftarPemesanan(jenis) {
+        if (!nilai("pmsIdDaftar")) {
+          alert("Isi ID Pembeli / Penyedia dulu!");
+          return;
+        }
+        panggilApi("/api/pemesanan/" + jenis + "/" + nilai("pmsIdDaftar"));
+      }
+
+      function buatPembayaran() {
+        if (!nilai("payIdPesanan") || !nilai("payMetode")) {
+          alert("ID Pesanan dan metode wajib diisi!");
+          return;
+        }
+        panggilApi("/api/pembayaran", "POST", {
+          id_pesanan: nilai("payIdPesanan"),
+          metode: nilai("payMetode"),
+        }).then((data) => {
+          if (data && data.berhasil && data.data && data.data.pembayaran) {
+            document.getElementById("payIdPembayaran").value =
+              data.data.pembayaran.id_pembayaran;
+          }
+        });
+      }
+
+      function lihatPembayaran() {
+        if (!nilai("payIdPembayaran")) {
+          alert("Isi ID Pembayaran dulu!");
+          return;
+        }
+        panggilApi("/api/pembayaran/" + nilai("payIdPembayaran"));
+      }
+
+      function simpanBukti() {
+        if (!nilai("payIdPembayaran") || !nilai("payBukti")) {
+          alert("Isi ID Pembayaran dan URL/path bukti!");
+          return;
+        }
+        panggilApi(
+          "/api/pembayaran/" + nilai("payIdPembayaran") + "/bukti",
+          "POST",
+          { bukti_pembayaran: nilai("payBukti") },
+        );
+      }
+
+      function aksiPembayaran(aksi) {
+        if (!nilai("payIdPembayaran")) {
+          alert("Isi ID Pembayaran dulu!");
+          return;
+        }
+        panggilApi(
+          "/api/pembayaran/" + nilai("payIdPembayaran") + "/" + aksi,
+          "PUT",
+          { id_penyedia: nilai("payPenyedia") },
+        );
+      }
+
+      function cariPembayaranPesanan() {
+        if (!nilai("payCariPesanan")) {
+          alert("Isi ID Pesanan dulu!");
+          return;
+        }
+        panggilApi("/api/pembayaran/pesanan/" + nilai("payCariPesanan"));
       }
     </script>
   </body>
