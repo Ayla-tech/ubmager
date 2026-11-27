@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Keranjang Pemesanan')}"></head>
+<body>
+<header th:replace="~{fragments/base :: navbar('keranjang')}"></header>
+
+<main class="mx-auto max-w-2xl px-4 pb-52 pt-6">
+
+  <!-- Judul dengan tombol kembali -->
+  <div class="mb-5 flex items-center gap-3">
+    <a th:href="@{/}" class="rounded-full p-2 text-stone-600 hover:bg-brand-50" aria-label="Kembali">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </a>
+    <h1 class="text-xl font-extrabold text-ink">Keranjang Pemesanan</h1>
+  </div>
+
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <!-- Keranjang kosong -->
+  <section th:if="${items.isEmpty()}" class="mt-6 rounded-2xl border border-stone-200 bg-white py-16 text-center">
+    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-3xl">&#128722;</div>
+    <h2 class="text-lg font-bold text-ink">Keranjangmu masih kosong</h2>
+    <p class="mt-1 text-sm text-stone-500">Simpan produk atau jasa dari beranda untuk dipesan nanti.</p>
+    <a th:href="@{/}" class="btn-primary mt-5 inline-flex">Jelajahi penawaran</a>
+  </section>
+
+  <div th:unless="${items.isEmpty()}">
+
+    <!-- Pilih semua -->
+    <form th:action="@{/keranjang/pilih-semua}" method="post"
+          class="mb-4 flex items-center justify-between rounded-xl bg-stone-100 px-4 py-3">
+      <input type="hidden" name="semua" th:value="${!semuaTerpilih}" />
+      <label class="flex cursor-pointer items-center gap-3 text-sm font-semibold text-ink">
+        <input type="checkbox" class="h-5 w-5 cursor-pointer accent-brand-600"
+               th:checked="${semuaTerpilih}" th:disabled="${!adaTersedia}" onchange="this.form.submit()" />
+        Pilih Semua
+      </label>
+      <span class="text-sm text-stone-500"><span th:text="${jumlahDipilih}">0</span> produk dipilih</span>
+    </form>
+
+    <!-- Daftar produk -->
+    <div class="space-y-3">
+      <article th:each="item : ${items}" class="rounded-2xl border border-stone-200 bg-white p-4"
+               th:classappend="${item.tidakTersedia()} ? 'pointer-events-none select-none opacity-60' : ''">
+
+        <div class="flex items-center gap-3">
+          <!-- Checkbox produk -->
+          <form th:action="@{/keranjang/pilih}" method="post">
+            <input type="hidden" name="idProduk" th:value="${item.idProduk()}" />
+            <input type="hidden" name="dipilih" th:value="${!item.dipilih()}" />
+            <input type="checkbox" class="h-5 w-5 cursor-pointer accent-brand-600"
+                   th:checked="${item.dipilih()}" th:disabled="${item.tidakTersedia()}"
+                   onchange="this.form.submit()" />
+          </form>
+
+          <!-- Gambar -->
+          <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </span>
+
+          <!-- Judul dan harga -->
+          <div class="min-w-0 flex-1">
+            <h2 class="truncate text-sm font-bold text-ink" th:text="${item.judul()}">Nama produk</h2>
+            <p class="mt-0.5 text-sm font-bold text-brand-600" th:text="${item.hargaTampil()}">Rp 0</p>
+            <p th:if="${item.jumlah() gt 1}" class="text-xs text-stone-500">
+              Subtotal <span th:text="${item.subtotalTampil()}">Rp 0</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Ubah detail, hapus, stepper jumlah -->
+        <div class="mt-3 flex items-center gap-2">
+          <button type="button" th:data-panel="'panel-' + ${item.idProduk()}"
+                  class="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-3 py-2 text-sm text-stone-600 hover:border-brand-300">
+            Ubah Detail
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+
+          <form th:action="@{/keranjang/hapus}" method="post" class="ml-auto"
+                onsubmit="return confirm('Hapus produk ini dari keranjang?')">
+            <input type="hidden" name="idProduk" th:value="${item.idProduk()}" />
+            <button type="submit" class="rounded-lg p-2 text-stone-400 hover:bg-red-50 hover:text-red-600" aria-label="Hapus produk">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </button>
+          </form>
+
+          <div class="flex items-center rounded-xl border border-stone-200">
+            <form th:action="@{/keranjang/jumlah}" method="post">
+              <input type="hidden" name="idProduk" th:value="${item.idProduk()}" />
+              <input type="hidden" name="jumlah" th:value="${item.jumlah() - 1}" />
+              <button type="submit" aria-label="Kurangi jumlah"
+                      class="px-3 py-2 text-lg leading-none text-stone-600 hover:text-brand-600 disabled:cursor-not-allowed disabled:text-stone-300"
+                      th:disabled="${item.jumlah() le 1 or item.tidakTersedia()}">&minus;</button>
+            </form>
+            <span class="min-w-8 text-center text-sm font-semibold text-ink" th:text="${item.jumlah()}">1</span>
+            <form th:action="@{/keranjang/jumlah}" method="post">
+              <input type="hidden" name="idProduk" th:value="${item.idProduk()}" />
+              <input type="hidden" name="jumlah" th:value="${item.jumlah() + 1}" />
+              <button type="submit" aria-label="Tambah jumlah"
+                      class="px-3 py-2 text-lg leading-none text-brand-600 hover:text-brand-700 disabled:cursor-not-allowed disabled:text-stone-300"
+                      th:disabled="${item.jumlah() ge 99 or item.tidakTersedia()}">+</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel detail (jadwal, lokasi, catatan) -->
+        <div th:unless="${item.tidakTersedia()}" th:id="'panel-' + ${item.idProduk()}"
+             class="mt-3 hidden border-t border-stone-200 pt-3">
+          <form th:action="@{/keranjang/ubah}" method="post" class="space-y-3">
+            <input type="hidden" name="idProduk" th:value="${item.idProduk()}" />
+            <label class="block text-xs font-semibold text-stone-500">Jadwal
+              <input type="datetime-local" name="jadwal" class="input mt-1" th:value="${item.jadwalInput()}" />
+            </label>
+            <label class="block text-xs font-semibold text-stone-500">Lokasi
+              <input type="text" name="lokasi" maxlength="100" class="input mt-1" th:value="${item.lokasi()}" placeholder="Contoh: Gedung Kuliah A" />
+            </label>
+            <label class="block text-xs font-semibold text-stone-500">Catatan
+              <textarea name="catatan" rows="2" class="input mt-1" th:text="${item.catatan()}" placeholder="Catatan tambahan"></textarea>
+            </label>
+            <button type="submit" class="btn-primary btn-sm">Simpan detail</button>
+          </form>
+        </div>
+
+        <!-- Peringatan produk tidak tersedia -->
+        <div th:if="${item.tidakTersedia()}"
+             class="mt-3 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          Peringatan Produk Tidak Tersedia
+        </div>
+      </article>
+    </div>
+
+    <!-- Bar total dan checkout -->
+    <div class="fixed inset-x-0 bottom-0 z-20 border-t border-stone-200 bg-white">
+      <div class="mx-auto max-w-2xl px-4 py-4">
+        <div class="mb-3 flex items-end justify-between">
+          <div>
+            <p class="text-sm text-stone-600">Total Pembayaran:</p>
+            <p class="text-xs text-stone-500"><span th:text="${totalPorsi}">0</span> porsi dipilih</p>
+          </div>
+          <p class="text-3xl font-extrabold text-ink" th:text="${totalTampil}">Rp 0</p>
+        </div>
+        <form th:action="@{/keranjang/checkout}" method="post">
+          <button type="submit"
+                  class="flex w-full cursor-pointer items-center justify-between rounded-2xl bg-brand-600 px-5 py-4 text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-400"
+                  th:disabled="${jumlahDipilih == 0}">
+            <span class="text-xs font-extrabold tracking-wide">OFFER</span>
+            <span class="inline-flex items-center gap-2 text-base font-bold">
+              Checkout
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Popup peringatan produk tidak tersedia -->
+<dialog id="dialog-peringatan" th:if="${!peringatan.isEmpty()}"
+        class="m-auto rounded-2xl p-0 shadow-xl backdrop:bg-black/40">
+  <form method="dialog" class="w-[min(26rem,90vw)] space-y-4 p-6">
+    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-2xl text-red-600">&#9888;</div>
+    <h3 class="text-lg font-bold text-ink">Produk tidak tersedia</h3>
+    <p class="text-sm text-stone-600">Produk berikut sudah tidak tersedia dan akan dihapus dari keranjang:</p>
+    <ul class="list-disc space-y-1 pl-5 text-sm font-semibold text-ink">
+      <li th:each="judul : ${peringatan}" th:text="${judul}">Nama produk</li>
+    </ul>
+    <button type="submit" class="btn-primary w-full">Mengerti</button>
+  </form>
+</dialog>
+
+<script>
+  document.querySelectorAll('[data-panel]').forEach(function (tombol) {
+    tombol.addEventListener('click', function () {
+      var panel = document.getElementById(tombol.dataset.panel);
+      if (!panel) { return; }
+      panel.classList.toggle('hidden');
+      tombol.querySelector('svg').classList.toggle('rotate-180');
+    });
+  });
+  var peringatan = document.getElementById('dialog-peringatan');
+  if (peringatan) { peringatan.showModal(); }
+</script>
+</body>
+</html>

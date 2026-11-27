@@ -14,8 +14,12 @@
       <a th:href="@{/daftar}" class="btn bg-white text-brand-700 hover:bg-brand-50">Daftar gratis</a>
       <a th:href="@{/login}" class="btn border border-white/40 text-white hover:bg-white/10">Masuk</a>
     </div>
-    <div th:if="${sesi.login()}" class="mt-6">
+    <div th:if="${sesi.login()}" class="mt-6 flex flex-wrap gap-3">
       <a th:href="@{/pesanan}" class="btn bg-white text-brand-700 hover:bg-brand-50">Lihat pesanan saya</a>
+      <a th:href="@{/keranjang}" class="btn border border-white/40 text-white hover:bg-white/10">Keranjang</a>
+      <a th:href="@{/riwayat}" class="btn border border-white/40 text-white hover:bg-white/10">Riwayat Transaksi</a>
+      <a th:href="@{/chat}" class="btn border border-white/40 text-white hover:bg-white/10">Buka Chat</a>
+      <a th:href="@{/notifikasi}" class="btn border border-white/40 text-white hover:bg-white/10">Notifikasi</a>
     </div>
     <div class="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-white/10"></div>
   </section>
@@ -45,6 +49,16 @@
         </span>
         <span th:if="${p.terpercaya()}" class="badge-terpercaya">Terpercaya</span>
       </a>
+
+      <div th:if="${sesi.login() and sesi.idUser() != p.idPenjual()}" class="mt-4 flex gap-2 border-t border-stone-100 pt-3">
+        <a th:href="@{/chat/mulai(idPostingan=${p.idPostingan()})}" class="btn-primary btn-sm flex-1 justify-center">
+          Chat penjual
+        </a>
+        <form th:action="@{/keranjang/tambah}" method="post" class="flex-1">
+          <input type="hidden" name="idPostingan" th:value="${p.idPostingan()}" />
+          <button type="submit" class="btn-ghost btn-sm w-full justify-center">Simpan ke keranjang</button>
+        </form>
+      </div>
     </article>
   </div>
 </main>

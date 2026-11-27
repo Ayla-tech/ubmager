@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Chat')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('chat')}"></header>
+
+<main class="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+  <h1 class="text-2xl font-extrabold">Chat</h1>
+  <p class="mb-6 mt-1 text-sm text-stone-500">Percakapanmu dengan penjual dan pembeli.</p>
+
+  <div th:if="${#lists.isEmpty(daftarPercakapan)}" class="card text-center text-sm text-stone-500">
+    Belum ada percakapan. Mulai dari tombol &ldquo;Chat penjual&rdquo; di beranda.
+  </div>
+
+  <div class="space-y-3">
+    <a th:each="c : ${daftarPercakapan}" th:href="@{/chat/{id}(id=${c.idConversation()})}"
+       class="card flex items-center gap-4 p-4 transition hover:border-brand-300">
+      <span class="avatar h-11 w-11 text-sm" th:text="${c.inisial()}">AB</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate font-bold text-ink" th:text="${c.namaLawan()}">Nama</span>
+        <span class="block truncate text-xs text-stone-500" th:text="${c.judulPostingan()}">Judul postingan</span>
+        <span class="block truncate text-sm text-stone-600" th:text="${c.pesanTerakhir()}">Pesan terakhir</span>
+      </span>
+      <span class="shrink-0 text-xs text-stone-400" th:text="${c.waktu()}">12 Nov, 10.15</span>
+    </a>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>

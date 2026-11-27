@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Ruang Chat')}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('chat')}"></header>
+
+<main class="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <style>
+    .chat-kepala { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #e7e5e4; }
+    .chat-area { height:420px; overflow-y:auto; padding:16px; background:#fffaf5; }
+    .chat-baris { display:flex; margin-bottom:8px; }
+    .chat-baris.saya { justify-content:flex-end; }
+    .chat-gelembung { max-width:75%; padding:8px 12px; border-radius:14px; font-size:14px; line-height:1.4; word-wrap:break-word; }
+    .chat-baris.lawan .chat-gelembung { background:#f5f5f4; color:#1f1a17; }
+    .chat-baris.saya .chat-gelembung { background:#f2631a; color:#fff; }
+    .chat-jam { display:block; margin-top:2px; font-size:10px; opacity:.7; text-align:right; }
+    .chat-kosong { text-align:center; font-size:14px; color:#78716c; padding-top:24px; }
+    .chat-input { display:flex; align-items:center; gap:8px; padding:12px 16px; border-top:1px solid #e7e5e4; }
+    .chat-menu { position:absolute; right:0; top:100%; z-index:10; width:260px; padding:12px; margin-top:6px;
+                 background:#fff; border:1px solid #e7e5e4; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+    .chat-menu form { margin:0 0 12px 0; }
+    .chat-menu form:last-child { margin-bottom:0; }
+  </style>
+
+  <section class="card" style="padding:0;">
+    <div class="chat-kepala">
+      <a th:href="@{/chat}" class="btn-ghost btn-sm" aria-label="Kembali">&larr;</a>
+      <span class="avatar h-10 w-10 text-sm" th:text="${inisial}">AB</span>
+      <div class="min-w-0" style="flex:1;">
+        <p class="truncate font-bold text-ink" th:text="${namaLawan}" style="margin:0;">Nama</p>
+        <p class="truncate text-xs text-stone-500" th:text="${judulPostingan}" style="margin:0;">Judul postingan</p>
+      </div>
+      <details style="position:relative;">
+        <summary class="btn-ghost btn-sm" style="list-style:none;" aria-label="Menu aksi">&#8942;</summary>
+        <div class="chat-menu">
+          <form th:action="@{/chat/{id}/blokir(id=${idConversation})}" method="post"
+                onsubmit="return confirm('Blokir pengguna ini? Pengguna tidak dapat lagi mengirim pesan kepadamu.');">
+            <button type="submit" class="btn-danger btn-sm" style="width:100%;">Blokir pengguna</button>
+          </form>
+          <form th:action="@{/chat/{id}/lapor(id=${idConversation})}" method="post">
+            <label class="label" for="alasan">Lapor pengguna</label>
+            <textarea id="alasan" name="alasan" rows="3" required maxlength="500" class="input"
+                      placeholder="Jelaskan alasan laporanmu"></textarea>
+            <button type="submit" class="btn-outline btn-sm" style="width:100%;margin-top:8px;">Kirim laporan</button>
+          </form>
+        </div>
+      </details>
+    </div>
+
+    <div id="areaPesan" class="chat-area">
+      <div th:fragment="daftarPesan" id="isiPesan">
+        <p th:if="${#lists.isEmpty(pesan)}" class="chat-kosong">Belum ada pesan. Sapa dulu!</p>
+        <div th:each="p : ${pesan}" class="chat-baris" th:classappend="${p.milikSaya()} ? 'saya' : 'lawan'">
+          <div class="chat-gelembung">
+            <img th:if="${p.gambar() != null}" th:src="@{/uploads/chat/{f}(f=${p.gambar()})}" alt="Gambar"
+                 style="max-width:220px;border-radius:10px;display:block;margin-bottom:4px;" />
+            <span th:if="${p.isi() != null}" th:text="${p.isi()}" style="white-space:pre-line;">Isi pesan</span>
+            <small class="chat-jam" th:text="${p.jam()}">10.15</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <form th:action="@{/chat/{id}/gambar(id=${idConversation})}" method="post" enctype="multipart/form-data"
+            style="margin:0;">
+        <label class="btn-outline btn-sm" title="Kirim gambar (JPG/PNG, maks. 5 MB)">Lampir
+          <input type="file" name="file" accept="image/png,image/jpeg" style="display:none;"
+                 onchange="this.form.submit()" />
+        </label>
+      </form>
+      <form th:action="@{/chat/{id}/kirim(id=${idConversation})}" method="post"
+            style="display:flex;gap:8px;flex:1;margin:0;">
+        <input type="text" name="teks" class="input" placeholder="Tulis pesan" autocomplete="off"
+               maxlength="1000" required />
+        <button type="submit" class="btn-primary">Kirim</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+
+<script th:inline="javascript">
+  // Muat pesan baru setiap 5 detik tanpa me-refresh halaman
+  const area = document.getElementById('areaPesan');
+  const alamat = /*[[@{/chat/{id}/pesan(id=${idConversation})}]]*/ '/chat/CVS001/pesan';
+  area.scrollTop = area.scrollHeight;
+
+  setInterval(async () => {
+    try {
+      const respons = await fetch(alamat);
+      if (!respons.ok || respons.redirected) { return; }
+      const dekat = area.scrollHeight - area.scrollTop - area.clientHeight < 80;
+      area.innerHTML = await respons.text();
+      if (dekat) { area.scrollTop = area.scrollHeight; }
+    } catch (e) { /* abaikan, coba lagi pada putaran berikutnya */ }
+  }, 5000);
+</script>
+</body>
+</html>

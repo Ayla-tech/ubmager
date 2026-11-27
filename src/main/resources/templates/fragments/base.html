@@ -24,10 +24,25 @@
            th:classappend="${aktif == 'beranda'} ? 'text-brand-600' : 'text-stone-600'">Beranda</a>
         <a th:if="${sesi.login()}" th:href="@{/pesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
            th:classappend="${aktif == 'pesanan'} ? 'text-brand-600' : 'text-stone-600'">Pesanan Saya</a>
-        <a th:if="${sesi.login()}" th:href="@{/pemesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
-           th:classappend="${aktif == 'pemesanan'} ? 'text-brand-600' : 'text-stone-600'">Pemesanan</a>
-        <a th:if="${sesi.login()}" th:href="@{/pembayaran}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
-           th:classappend="${aktif == 'pembayaran'} ? 'text-brand-600' : 'text-stone-600'">Pembayaran</a>
+
+        <a th:if="${sesi.login()}" th:href="@{/keranjang}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'keranjang'} ? 'text-brand-600' : 'text-stone-600'">Keranjang</a>
+<a th:if="${sesi.login()}" th:href="@{/riwayat}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'riwayat'} ? 'text-brand-600' : 'text-stone-600'">Riwayat</a>
+<a th:if="${sesi.login()}" th:href="@{/pemesanan}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'pemesanan'} ? 'text-brand-600' : 'text-stone-600'">Pemesanan</a>
+<a th:if="${sesi.login()}" th:href="@{/pembayaran}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'pembayaran'} ? 'text-brand-600' : 'text-stone-600'">Pembayaran</a>
+<a th:if="${sesi.login()}" th:href="@{/chat}" class="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'chat'} ? 'text-brand-600' : 'text-stone-600'">Chat</a>
+<a th:if="${sesi.login()}" th:href="@{/notifikasi}" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-brand-50"
+   th:classappend="${aktif == 'notifikasi'} ? 'text-brand-600' : 'text-stone-600'">
+    <span>Notifikasi</span>
+    <span th:if="${belumDibaca != null and belumDibaca > 0}"
+          class="rounded-full bg-brand-600 px-1.5 py-0.5 text-[11px] font-bold leading-none text-white"
+          th:text="${belumDibaca}">1</span>
+</a>
+
       </nav>
     </div>
 
@@ -44,6 +59,12 @@
       <div class="absolute right-0 mt-2 w-56 rounded-xl border border-stone-200 bg-white p-1.5 shadow-lg">
         <a th:href="@{/profil}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50">Profil Saya</a>
         <a th:href="@{/pesanan}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Pesanan Saya</a>
+        <a th:href="@{/keranjang}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Keranjang</a>
+        <a th:href="@{/riwayat}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Riwayat Transaksi</a>
+        <a th:href="@{/pemesanan}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Pemesanan</a>
+        <a th:href="@{/pembayaran}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Pembayaran</a>
+        <a th:href="@{/chat}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Chat</a>
+        <a th:href="@{/notifikasi}" class="block rounded-lg px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-50 sm:hidden">Notifikasi</a>
         <form th:action="@{/logout}" method="post">
           <button type="submit" class="w-full cursor-pointer rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50">Keluar</button>
         </form>
