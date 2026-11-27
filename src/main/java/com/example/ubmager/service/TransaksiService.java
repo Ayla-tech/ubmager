@@ -2,11 +2,13 @@ package com.example.ubmager.service;
 
 import com.example.ubmager.dto.Hasil;
 import com.example.ubmager.entity.Keranjang;
+import com.example.ubmager.entity.Pemesanan;
 import com.example.ubmager.entity.Pesanan;
 import com.example.ubmager.entity.Postingan;
 import com.example.ubmager.entity.ProdukKeranjang;
 import com.example.ubmager.entity.Transaksi;
 import com.example.ubmager.repository.KeranjangRepository;
+import com.example.ubmager.repository.PemesananRepository;
 import com.example.ubmager.repository.PesananRepository;
 import com.example.ubmager.repository.PostinganRepository;
 import com.example.ubmager.repository.ProdukKeranjangRepository;
@@ -43,6 +45,7 @@ public class TransaksiService {
     private final TransaksiRepository transaksiRepository;
     private final PostinganRepository postinganRepository;
     private final PesananRepository pesananRepository;
+    private final PemesananRepository pemesananRepository;
     private final UserRepository userRepository;
     private final KeranjangRepository keranjangRepository;
     private final ProdukKeranjangRepository produkKeranjangRepository;
@@ -51,6 +54,7 @@ public class TransaksiService {
     public TransaksiService(TransaksiRepository transaksiRepository,
             PostinganRepository postinganRepository,
             PesananRepository pesananRepository,
+            PemesananRepository pemesananRepository,
             UserRepository userRepository,
             KeranjangRepository keranjangRepository,
             ProdukKeranjangRepository produkKeranjangRepository,
@@ -58,6 +62,7 @@ public class TransaksiService {
         this.transaksiRepository = transaksiRepository;
         this.postinganRepository = postinganRepository;
         this.pesananRepository = pesananRepository;
+        this.pemesananRepository = pemesananRepository;
         this.userRepository = userRepository;
         this.keranjangRepository = keranjangRepository;
         this.produkKeranjangRepository = produkKeranjangRepository;
@@ -94,7 +99,20 @@ public class TransaksiService {
         if (!STATUS_VALID.contains(status)) {
             status = "menunggu";
         }
-        return catatTransaksi(pesanan.get().getIdPembeli(), pesanan.get().getIdPostingan(), jumlah, status);
+
+        Pesanan p = pesanan.get();
+        if (!userRepository.existsById(p.getIdPembeli())) {
+            return new Hasil(false, "Pengguna tidak ditemukan", null);
+        }
+        Optional<Postingan> post = postinganRepository.findById(p.getIdPostingan());
+        if (post.isEmpty()) {
+            return new Hasil(false, "Postingan tidak ditemukan", null);
+        }
+        // Total harga memakai total yang sudah tersimpan di pesanan; kalau kosong, hitung dari harga postingan
+        double total = p.getTotalHarga() != null
+                ? p.getTotalHarga().doubleValue()
+                : post.get().getHarga().doubleValue() * jumlah;
+        return simpan(p.getIdPembeli(), post.get(), jumlah, total, status);
     }
 
     // Mencatat seluruh produk yang dicentang di keranjang sebagai transaksi
@@ -154,6 +172,53 @@ public class TransaksiService {
         transaksi.get().setStatusTransaksi(status);
         transaksiRepository.save(transaksi.get());
         return new Hasil(true, "Status transaksi diperbarui", transaksi.get());
+    }
+
+    // Menyalin pesanan berstatus "selesai" yang belum tercatat ke tabel transaksi.
+    // Dipanggil saat halaman riwayat dibuka. Mengembalikan jumlah transaksi baru.
+    @Transactional
+    public int sinkronDariPesananSelesai() {
+        int dicatat = 0;
+        for (String idPesanan : transaksiRepository.cariPesananSelesaiBelumDicatat()) {
+            if (catatPesananSelesai(idPesanan).berhasil()) {
+                dicatat++;
+            }
+        }
+        return dicatat;
+    }
+
+    private Hasil catatPesananSelesai(String idPesanan) {
+        Optional<Pesanan> cariPesanan = pesananRepository.findById(idPesanan);
+        if (cariPesanan.isEmpty()) {
+            return new Hasil(false, "Pesanan tidak ditemukan", null);
+        }
+        Pesanan pesanan = cariPesanan.get();
+        Optional<Postingan> post = postinganRepository.findById(pesanan.getIdPostingan());
+        if (post.isEmpty()) {
+            return new Hasil(false, "Postingan tidak ditemukan", null);
+        }
+
+        // Pesanan lama tanpa data pemesanan dianggap berjumlah 1
+        int jumlah = pemesananRepository.findByIdPesanan(idPesanan).map(Pemesanan::getJumlah).orElse(1);
+        double total = pesanan.getTotalHarga() != null
+                ? pesanan.getTotalHarga().doubleValue()
+                : post.get().getHarga().doubleValue() * jumlah;
+
+        Transaksi transaksi = new Transaksi();
+        transaksi.setIdTransaksi(idGenerator.buat("TRX", "transaksi", "id_transaksi"));
+        transaksi.setIdPesanan(idPesanan);
+        transaksi.setIdUser(pesanan.getIdPembeli());
+        transaksi.setIdPostingan(post.get().getIdPostingan());
+        transaksi.setJudulPostingan(post.get().getJudul());
+        transaksi.setKategori(post.get().getKategori());
+        transaksi.setJumlah(jumlah);
+        transaksi.setTotalHarga(total);
+        transaksi.setTanggalTransaksi(pesanan.getTanggalPesan() != null
+                ? pesanan.getTanggalPesan()
+                : LocalDateTime.now());
+        transaksi.setStatusTransaksi("selesai");
+        transaksiRepository.saveAndFlush(transaksi);
+        return new Hasil(true, "Transaksi berhasil dicatat", transaksi);
     }
 
     // Menyusun dan menyimpan satu baris transaksi
