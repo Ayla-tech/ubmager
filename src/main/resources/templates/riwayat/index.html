@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Riwayat Transaksi')}"></head>
+<body>
+<header th:replace="~{fragments/base :: navbar('riwayat')}"></header>
+
+<main class="mx-auto max-w-2xl px-4 py-6">
+  <h1 class="mb-4 text-2xl font-extrabold text-ink">Riwayat Transaksi</h1>
+
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <!-- Search bar -->
+  <form th:action="@{/riwayat}" method="get" class="relative mb-3">
+    <input type="hidden" name="peran" th:value="${peran}" />
+    <input type="hidden" name="kategori" th:value="${kategori}" />
+    <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" name="q" th:value="${q}" maxlength="100" placeholder="Cari transaksi kamu"
+           class="w-full rounded-xl border border-transparent bg-stone-100 py-3 pl-12 pr-10 text-sm text-ink focus:border-brand-500 focus:bg-white focus:outline-none" />
+    <a th:if="${!q.isEmpty()}" th:href="@{/riwayat(peran=${peran},kategori=${kategori})}"
+       class="absolute right-4 top-1/2 -translate-y-1/2 text-lg leading-none text-stone-400 hover:text-stone-600"
+       aria-label="Hapus pencarian">&times;</a>
+  </form>
+
+  <!-- Tab peran -->
+  <div class="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-stone-100 p-1">
+    <a th:href="@{/riwayat(peran='pembeli',q=${q})}" class="rounded-lg py-2.5 text-center text-sm font-semibold"
+       th:classappend="${peran == 'pembeli'} ? 'bg-white text-ink shadow-sm' : 'text-stone-500'">Pembelian</a>
+    <a th:href="@{/riwayat(peran='penjual',q=${q})}" class="rounded-lg py-2.5 text-center text-sm font-semibold"
+       th:classappend="${peran == 'penjual'} ? 'bg-white text-ink shadow-sm' : 'text-stone-500'">Penjualan</a>
+  </div>
+
+  <!-- Filter kategori -->
+  <div th:if="${!daftarKategori.isEmpty()}" class="mb-4">
+    <div class="mb-2 flex items-center justify-between">
+      <span class="text-sm font-semibold text-ink">Kategori</span>
+      <a th:href="@{/riwayat(peran=${peran})}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Reset</a>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a th:href="@{/riwayat(peran=${peran},q=${q})}"
+         class="inline-flex items-center gap-1 rounded-full border px-3.5 py-1.5 text-xs font-medium"
+         th:classappend="${kategori.isEmpty()} ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-stone-200 bg-white text-stone-600 hover:border-brand-300'">
+        <svg th:if="${kategori.isEmpty()}" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        Semua
+      </a>
+      <a th:each="k : ${daftarKategori}" th:href="@{/riwayat(peran=${peran},kategori=${k},q=${q})}"
+         class="inline-flex items-center gap-1 rounded-full border px-3.5 py-1.5 text-xs font-medium"
+         th:classappend="${kategori == k} ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-stone-200 bg-white text-stone-600 hover:border-brand-300'">
+        <svg th:if="${kategori == k}" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span th:text="${k}">Kategori</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Hasil untuk kata kunci -->
+  <div th:if="${!q.isEmpty()}" class="mb-3 flex items-center justify-between text-sm">
+    <span class="text-stone-600">Hasil untuk <strong class="text-brand-700" th:text="'&quot;' + ${q} + '&quot;'">"kata"</strong></span>
+    <a th:href="@{/riwayat(peran=${peran},kategori=${kategori})}" class="font-semibold text-brand-600 hover:text-brand-700">Hapus</a>
+  </div>
+
+  <!-- Riwayat kosong -->
+  <section th:if="${!adaTransaksi}" class="rounded-2xl border border-stone-200 bg-white py-16 text-center">
+    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-3xl">&#128203;</div>
+    <h2 class="text-lg font-bold text-ink">Belum ada riwayat transaksi</h2>
+    <p class="mt-1 text-sm text-stone-500">Transaksi yang kamu lakukan akan tercatat di sini.</p>
+    <a th:href="@{/}" class="btn-primary mt-5 inline-flex">Lihat penawaran</a>
+  </section>
+
+  <!-- Tidak ada hasil -->
+  <section th:if="${adaTransaksi and kartu.isEmpty()}" class="rounded-2xl border border-stone-200 bg-white py-12 text-center">
+    <h2 class="text-lg font-bold text-ink">Tidak ada riwayat yang sesuai</h2>
+    <p class="mt-1 text-sm text-stone-500">Coba ganti kata kunci atau kategori.</p>
+    <a th:href="@{/riwayat(peran=${peran})}" class="btn-ghost mt-4 inline-flex">Reset pencarian</a>
+  </section>
+
+  <!-- Kartu transaksi -->
+  <section class="space-y-3">
+    <article th:each="k : ${kartu}" class="rounded-2xl border border-stone-200 bg-white p-4">
+
+      <!-- Tanggal dan status -->
+      <div class="flex items-center justify-between">
+        <span class="inline-flex items-center gap-1.5 text-xs text-stone-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+          <span th:text="${k.tanggal()}">28 Okt 2026</span>
+        </span>
+        <span class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold" th:text="${k.statusLabel()}"
+              th:classappend="${k.status() == 'selesai'} ? 'bg-emerald-100 text-emerald-700'
+                : (${k.status() == 'dibayar'} ? 'bg-sky-100 text-sky-700'
+                : (${k.status() == 'menunggu'} ? 'bg-amber-100 text-amber-700' : 'bg-stone-200 text-stone-600'))">Selesai</span>
+      </div>
+
+      <!-- Gambar, judul, kategori, harga -->
+      <div class="mt-3 flex items-center gap-3">
+        <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        </span>
+        <div class="min-w-0">
+          <h2 class="truncate text-base font-bold" th:text="${k.judul()}"
+              th:classappend="${!q.isEmpty()} ? 'text-brand-700' : 'text-ink'">Judul</h2>
+          <p class="text-xs text-stone-500"><span th:text="${k.kategori()}">Kategori</span> &middot; <span th:text="${k.jumlah()}">1</span> barang</p>
+          <p class="mt-0.5 text-base font-extrabold text-ink" th:text="${k.total()}">Rp 0</p>
+        </div>
+      </div>
+
+      <!-- Tombol -->
+      <div class="mt-3 grid grid-cols-2 gap-2">
+        <button type="button" th:data-panel="'detail-' + ${k.idTransaksi()}"
+                class="rounded-xl border border-stone-200 py-2.5 text-sm font-semibold text-ink hover:border-brand-300">Detail Transaksi</button>
+        <a th:href="@{/riwayat/unduh/{id}(id=${k.idTransaksi()})}"
+           class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-50 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Unduh PDF
+        </a>
+      </div>
+
+      <!-- Rincian transaksi -->
+      <dl th:id="'detail-' + ${k.idTransaksi()}" class="mt-3 hidden gap-3 rounded-xl bg-stone-50 p-4 text-sm sm:grid-cols-2">
+        <div><dt class="text-xs text-stone-500">ID Transaksi</dt><dd class="font-semibold text-ink" th:text="${k.idTransaksi()}">TRX001</dd></div>
+        <div><dt class="text-xs text-stone-500">Waktu transaksi</dt><dd class="font-semibold text-ink" th:text="${k.tanggalLengkap()}">28 Oktober 2026</dd></div>
+        <div><dt class="text-xs text-stone-500">Jumlah barang</dt><dd class="font-semibold text-ink" th:text="${k.jumlah()}">1</dd></div>
+        <div><dt class="text-xs text-stone-500">Total harga</dt><dd class="font-semibold text-ink" th:text="${k.total()}">Rp 0</dd></div>
+        <div><dt class="text-xs text-stone-500">Status</dt><dd class="font-semibold text-ink" th:text="${k.statusLabel()}">Selesai</dd></div>
+      </dl>
+    </article>
+  </section>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+
+<script>
+  document.querySelectorAll('[data-panel]').forEach(function (tombol) {
+    tombol.addEventListener('click', function () {
+      var panel = document.getElementById(tombol.dataset.panel);
+      if (!panel) { return; }
+      panel.classList.toggle('hidden');
+      panel.classList.toggle('grid');
+    });
+  });
+</script>
+</body>
+</html>
