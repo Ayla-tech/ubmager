@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head(${jasa.judul()})}"></head>
+<body class="flex min-h-screen flex-col">
+<header th:replace="~{fragments/base :: navbar('jasa')}"></header>
+
+<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+  <div th:replace="~{fragments/base :: alert}"></div>
+
+  <nav class="flex flex-wrap items-center gap-2 text-sm text-stone-500" aria-label="Breadcrumb">
+    <a th:href="@{/}" class="hover:text-brand-600">Beranda</a>
+    <span aria-hidden="true">/</span>
+    <a th:href="@{/jasa}" class="hover:text-brand-600">Jelajahi jasa</a>
+    <span aria-hidden="true">/</span>
+    <span class="truncate font-semibold text-stone-700" th:text="${jasa.judul()}">Judul</span>
+  </nav>
+
+  <div class="mt-5 grid items-start gap-6 lg:grid-cols-3">
+    <section class="space-y-6 lg:col-span-2">
+      <article class="card">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="badge bg-brand-100 text-brand-700" th:text="${jasa.kategori()}">Kategori</span>
+          <span th:if="${jasa.aktif()}" class="badge bg-emerald-100 text-emerald-800">Penawaran aktif</span>
+          <span th:unless="${jasa.aktif()}" class="badge bg-stone-200 text-stone-600">Tidak aktif</span>
+          <span th:if="${jasa.terpercaya()}" class="badge-terpercaya">Penjual terpercaya</span>
+        </div>
+
+        <h1 class="mt-4 text-3xl font-extrabold leading-tight" th:text="${jasa.judul()}">Judul jasa</h1>
+        <p class="mt-4 text-2xl font-extrabold text-brand-600" th:text="${jasa.harga()}">Rp 0</p>
+        <p class="mt-1 text-sm text-stone-500">Harga per satuan. Total akhir dihitung otomatis saat kamu mengisi jumlah.</p>
+
+        <div class="mt-6 border-t border-stone-100 pt-6">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-stone-500">Deskripsi</h2>
+          <p class="mt-2 whitespace-pre-line text-sm leading-relaxed text-stone-700" th:text="${jasa.deskripsi()}">Deskripsi jasa</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-stone-500">Tentang penyedia</h2>
+        <div class="mt-4 flex flex-wrap items-center gap-4">
+          <span class="avatar h-12 w-12 text-base" th:text="${jasa.inisial()}">AB</span>
+          <div class="min-w-0 flex-1">
+            <a th:href="@{/pengguna/{id}(id=${jasa.idPenjual()})}" class="text-base font-bold text-ink hover:text-brand-600" th:text="${jasa.namaPenjual()}">Nama penyedia</a>
+            <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-stone-500">
+              <span th:if="${jasa.adaReview()}" class="flex items-center gap-1.5">
+                <span th:replace="~{fragments/base :: bintang(${jasa.bintang()})}"></span>
+                <span th:text="${jasa.ratingTampil()}">4.5</span>
+              </span>
+              <span th:unless="${jasa.adaReview()}">Belum ada review</span>
+              <span aria-hidden="true">·</span>
+              <span th:text="${jasa.idPenjual()}">USR000</span>
+            </div>
+          </div>
+          <a th:href="@{/pengguna/{id}(id=${jasa.idPenjual()})}" class="btn-outline btn-sm">Lihat profil</a>
+        </div>
+        <p class="mt-4 rounded-xl bg-brand-50/70 px-4 py-3 text-xs leading-relaxed text-stone-600">
+          Reputasi dan review membantu kamu memilih penyedia. Pembayaran tetap dikonfirmasi manual oleh penyedia setelah bukti dikirim.
+        </p>
+      </article>
+    </section>
+
+    <aside class="lg:col-span-1">
+      <section class="card lg:sticky lg:top-24">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-extrabold">Ajukan pemesanan</h2>
+            <p class="mt-1 text-xs text-stone-500">Isi detail, lalu periksa ringkasan sebelum mengirim.</p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2 text-xs font-bold">
+            <span id="indikatorSatu" class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-white">1</span>
+            <span class="h-px w-4 bg-stone-300" aria-hidden="true"></span>
+            <span id="indikatorDua" class="flex h-7 w-7 items-center justify-center rounded-full bg-stone-100 text-stone-500">2</span>
+          </div>
+        </div>
+
+        <div th:if="${!jasa.aktif()}" class="mt-5 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+          Penawaran ini sedang tidak aktif, jadi belum bisa dipesan.
+        </div>
+
+        <div th:if="${jasa.aktif() and milikSendiri}" class="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Ini penawaran milikmu sendiri. Kamu tidak bisa memesan jasa sendiri dari halaman ini.
+        </div>
+
+        <div th:if="${jasa.aktif() and !milikSendiri}">
+          <form id="formPemesanan" class="mt-5 space-y-4" novalidate
+                th:attr="data-id-postingan=${jasa.idPostingan()},data-id-pembeli=${sesi.idUser()},data-harga=${jasa.hargaAngka()}">
+            <div id="langkahIsi" class="space-y-4">
+              <div>
+                <label class="label" for="jumlahPesanan">Jumlah</label>
+                <input id="jumlahPesanan" name="jumlah" type="number" inputmode="numeric" min="1" step="1" value="1" required class="input" />
+                <p class="hint">Harga satuan <span class="font-semibold text-stone-700" th:text="${jasa.harga()}">Rp 0</span></p>
+              </div>
+
+              <div>
+                <label class="label" for="waktuPesanan">Waktu pelaksanaan</label>
+                <input id="waktuPesanan" name="waktu" type="datetime-local" required class="input" />
+                <p class="hint">Pilih tanggal dan jam yang kamu inginkan.</p>
+              </div>
+
+              <div>
+                <label class="label" for="lokasiPesanan">Lokasi</label>
+                <input id="lokasiPesanan" name="lokasi" type="text" maxlength="255" required class="input"
+                       placeholder="Contoh: Jl. Merdeka 10, Bandung" />
+              </div>
+
+              <div>
+                <label class="label" for="catatanPesanan">Catatan <span class="font-normal text-stone-400">(opsional)</span></label>
+                <textarea id="catatanPesanan" name="catatan" rows="3" maxlength="500" class="input"
+                          placeholder="Detail kebutuhan, ukuran, atau permintaan khusus"></textarea>
+              </div>
+
+              <div class="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3">
+                <span class="text-sm font-semibold text-stone-600">Estimasi total</span>
+                <span id="estimasiTotal" class="text-base font-extrabold text-brand-600" th:text="${jasa.harga()}">Rp 0</span>
+              </div>
+
+              <div id="pesanForm" class="alert-error" hidden role="alert"></div>
+
+              <button type="submit" class="btn-primary w-full">Lanjut ke ringkasan</button>
+            </div>
+
+            <div id="langkahRingkasan" class="space-y-4" hidden>
+              <div class="rounded-xl border border-stone-200 bg-stone-50/60 p-4">
+                <dl class="space-y-2.5 text-sm">
+                  <div class="flex items-start justify-between gap-4">
+                    <dt class="text-stone-500">Jasa</dt>
+                    <dd class="max-w-[60%] text-right font-semibold" th:text="${jasa.judul()}">Judul</dd>
+                  </div>
+                  <div class="flex items-center justify-between gap-4">
+                    <dt class="text-stone-500">Jumlah</dt>
+                    <dd class="font-semibold" id="ringkasanJumlah">1</dd>
+                  </div>
+                  <div class="flex items-center justify-between gap-4">
+                    <dt class="text-stone-500">Harga satuan</dt>
+                    <dd class="font-semibold" id="ringkasanHarga">Rp 0</dd>
+                  </div>
+                  <div class="flex items-center justify-between gap-4 border-t border-stone-200 pt-2.5">
+                    <dt class="font-semibold text-stone-700">Total</dt>
+                    <dd class="text-base font-extrabold text-brand-600" id="ringkasanTotal">Rp 0</dd>
+                  </div>
+                  <div class="flex items-start justify-between gap-4">
+                    <dt class="text-stone-500">Waktu</dt>
+                    <dd class="max-w-[60%] text-right font-semibold" id="ringkasanWaktu">-</dd>
+                  </div>
+                  <div class="flex items-start justify-between gap-4">
+                    <dt class="text-stone-500">Lokasi</dt>
+                    <dd class="max-w-[60%] text-right font-semibold" id="ringkasanLokasi">-</dd>
+                  </div>
+                  <div class="flex items-start justify-between gap-4">
+                    <dt class="text-stone-500">Catatan</dt>
+                    <dd class="max-w-[60%] whitespace-pre-line text-right font-semibold" id="ringkasanCatatan">-</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <p class="text-xs leading-relaxed text-stone-500">
+                Dengan mengirim, pesanan berstatus <span class="font-semibold">menunggu persetujuan</span> penyedia. Kamu bisa membayar setelah pesanan diterima.
+              </p>
+
+              <div id="pesanRingkasan" class="alert-error" hidden role="alert"></div>
+
+              <div class="flex gap-2">
+                <button type="button" id="tombolUbah" class="btn-outline flex-1">Ubah</button>
+                <button type="button" id="tombolKirim" class="btn-primary flex-1">Kirim pesanan</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <p th:if="${!jasa.aktif() or milikSendiri}" class="mt-4 text-xs text-stone-500">
+          Kamu tetap bisa melihat <a th:href="@{/jasa}" class="font-semibold text-brand-600 hover:underline">jasa lain</a>.
+        </p>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+<script th:src="@{/js/transaksi.js}" defer></script>
+</body>
+</html>

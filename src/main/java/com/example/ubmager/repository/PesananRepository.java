@@ -6,5 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PesananRepository extends JpaRepository<Pesanan, String> {
     boolean existsByIdPembeli(String idPembeli);
+
     List<Pesanan> findByIdPembeliOrderByIdPesananDesc(String idPembeli);
+
+    List<Pesanan> findByIdPembeliOrderByTanggalPesanDesc(String idPembeli);
 }

@@ -25,7 +25,7 @@
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 cursor-pointer;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 @utility alert {
@@ -120,6 +120,18 @@
   .badge-dibatalkan {
     @apply badge bg-stone-200 text-stone-600;
   }
+  .badge-diterima {
+    @apply badge bg-sky-100 text-sky-800;
+  }
+  .badge-ditolak {
+    @apply badge bg-red-100 text-red-700;
+  }
+  .badge-dikonfirmasi {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+  .badge-perbaikan {
+    @apply badge bg-orange-100 text-orange-800;
+  }
 
   /* ---------- Bintang ---------- */
   .stars {
@@ -130,6 +142,23 @@
   }
   .stars .off {
     @apply text-stone-300;
+  }
+
+  /* ---------- Langkah status ---------- */
+  .tl-dot {
+    @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold;
+  }
+  .tl-done {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+  .tl-wait {
+    @apply bg-amber-100 text-amber-700;
+  }
+  .tl-fail {
+    @apply bg-red-100 text-red-700;
+  }
+  .tl-idle {
+    @apply bg-stone-100 text-stone-400;
   }
 
   .star-input {

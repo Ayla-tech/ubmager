@@ -11,10 +11,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthInterceptor())
-                .addPathPatterns("/profil/**", "/pesanan/**", "/review/**", "/admin/**",
-                        "/chat/**", "/notifikasi/**", "/uploads/**", "/api/chat/**", "/api/notifikasi/**")
-                .excludePathPatterns("/admin/login");
-    }
+
+                .addPathPatterns(
+        "/profil/**", "/pesanan/**", "/review/**",
+        "/jasa/**", "/pemesanan/**", "/pembayaran/**",
+        "/admin/**", "/chat/**", "/notifikasi/**",
+        "/uploads/**", "/api/chat/**", "/api/notifikasi/**"
+)
+.excludePathPatterns("/admin/login");
+}
 
     // Gambar chat yang diunggah disajikan dari folder uploads/
     @Override
